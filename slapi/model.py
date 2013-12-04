@@ -23,7 +23,7 @@ TRAIN_DISPLAY = u'DisplayTime'
 DISPLAY_NAME_RE = re.compile('^([0-9]+) +([a-zA-ZåäöÅÄÖ\.]+) *([0-9]+[:0-9]* ?[min]*\.?) *,?')
 
 METRO_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetDepartures.json?&siteId=%s&key=%s'
-TRAIN_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetDpsDepartures.json?&siteId=%s&key=%s'
+TRAIN_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetDpsDepartures.json?&siteId=%s&key=%s&timeWindow=60'
 STATION_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetSite.json?&stationSearch=%s&key=%s'
 
 # i dont care about fjärrtåg
