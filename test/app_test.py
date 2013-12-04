@@ -13,8 +13,8 @@ from flask import request
 RENDER_EXPECTED = """<table id="sl_time_table">
 <tr><th style="width:3%"></th>
 <th style="width:75px;text-align:center"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/SL_logo.svg" height="30px" /></th>
-<th style="padding-left:20">test </th>
-<th style="width:12%;text-align:center">min.</th>
+<th style="color:#888888;padding-left:20;font-size:24px">test </th>
+<th style="color:#888888;width:12%;text-align:center;font-size:24px">min.</th>
 </tr>
 <tr>
 <td style="background-color:mediumGray"></td>
