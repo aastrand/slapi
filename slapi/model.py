@@ -23,6 +23,7 @@ DISPLAY_NAME_RE = re.compile('^([0-9]+) +([a-zA-ZåäöÅÄÖ\.]+) *([0-9]+[:0-9
 
 METRO_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetDepartures.json?&siteId=%s&key=%s'
 TRAIN_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetDpsDepartures.json?&siteId=%s&key=%s'
+STATION_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetSite.json?&stationSearch=%s&key=%s'
 
 # i dont care about fjärrtåg
 BANNED_DESTINATIONS = set([u'Fjärrtåg'])
@@ -130,7 +131,7 @@ def parse_json_response(text):
     jdata = json.loads(text)
     data = []
     # iterate over buses, trains, trams etc
-    for transport_type, transport in jdata.get('Departure', jdata.get('DPS', {})).iteritems():
+    for transport_type, transport in jdata.get(u'Departure', jdata.get(u'DPS', {})).iteritems():
         # Metros/Metro sub iteration
         if transport_type in TYPES and transport:
             for item in transport.values()[0]:
@@ -169,9 +170,23 @@ def parse_json_response(text):
     return data
 
 
+def parse_json_site_response(text):
+    """
+    Helper function to parse and extract the station name from the
+    trafiklab JSON site response.
+    """
+    jdata = json.loads(text)
+    data = []
+    for site_type, site in jdata.get(u'Hafas', {}).iteritems():
+        if site_type == u'Sites':
+            for item in site.values():
+                data.append({u'name': item['Name']})
+    return data
+
+
 def get_departure(url_template, station, key):
     """
-    Helper function to get the parses response for the given
+    Helper function to get the parsed response for the given
     URL, station and API key.
     """
     r = requests.get(url_template % (station, key))
@@ -194,4 +209,23 @@ def get_departures(station, key):
     # sort on time to departure
     data.sort(key=lambda x: x['time'])
 
+    # TODO: cache this?
+
     return data
+
+
+def get_station_name(station, key):
+    """
+    Returns the name of the given station ID.
+    """
+    r = requests.get(STATION_URL_TEMPLATE % (station, key))
+    if r.status_code != 200:
+        raise ApiException('Error while querying the trafiklab API')
+
+    data = parse_json_site_response(r.text)
+    if len(data) < 1:
+        raise ApiException('Site name response from trafiklab was empty')
+
+    # TODO: cache this
+
+    return data[0][u'name']

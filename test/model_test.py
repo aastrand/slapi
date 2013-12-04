@@ -876,6 +876,23 @@ TRAIN_JSON_TESTINPUT = u"""
 }
 """
 
+SITE_JSON_TEST_INPUT = u"""
+{
+  "Hafas": {
+    "xmlnsxsi": "http://www.w3.org/2001/XMLSchema-instance",
+    "xmlnsxsd": "http://www.w3.org/2001/XMLSchema",
+    "xmlns": "http://www1.sl.se/realtidws/",
+    "ExecutionTime": "00:00:00.0781270",
+    "Sites": {
+      "Site": {
+        "Number": "5119",
+        "Name": "Solna Business Park (Solna)"
+      }
+    }
+  }
+}
+"""
+
 
 import pprint
 
@@ -1383,3 +1400,41 @@ class ModelTest(unittest.TestCase):
         for item in out:
             self.assertEquals(type(item), dict)
             self.assertTrue(len(item) > 0)
+
+    def test_parse_site_response(self):
+        expected = [{u'name': u'Solna Business Park (Solna)'}]
+        self.assertEquals(model.parse_json_site_response(SITE_JSON_TEST_INPUT),
+                          expected)
+
+    @patch('slapi.model.requests')
+    def test_get_statio_name(self, req_mock):
+        req_mock.get = Mock()
+        req_mock.get.return_value = Mock()
+        req_mock.get.return_value.status_code = 500
+
+        self.assertRaises(model.ApiException, model.get_station_name,
+                          31337, 'deadbeef')
+
+        def mock_get(*args):
+            resp = Mock()
+            resp.status_code = 200
+            resp.text = '{}'
+            return resp
+
+        req_mock.get = mock_get
+
+        self.assertRaises(model.ApiException, model.get_station_name,
+                          31337, 'deadbeef')
+
+        responses = [SITE_JSON_TEST_INPUT]
+
+        def mock_get(*args):
+            resp = Mock()
+            resp.status_code = 200
+            resp.text = responses.pop(0)
+            return resp
+
+        req_mock.get = mock_get
+
+        self.assertEquals(model.get_station_name(31337, 'deadbeef'),
+                          u'Solna Business Park (Solna)')
