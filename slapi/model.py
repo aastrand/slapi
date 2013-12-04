@@ -6,6 +6,7 @@ import json
 import logging
 import re
 
+import gocept.cache.method as cache
 import requests
 
 # we only want data for these types, errors and what not begone
@@ -196,6 +197,7 @@ def get_departure(url_template, station, key):
     return parse_json_response(r.text)
 
 
+@cache.Memoize(10)
 def get_departures(station, key):
     """
     Returns a list of all departures for the given station.
@@ -209,11 +211,10 @@ def get_departures(station, key):
     # sort on time to departure
     data.sort(key=lambda x: x['time'])
 
-    # TODO: cache this?
-
     return data
 
 
+@cache.Memoize(24 * 60 * 60)
 def get_station_name(station, key):
     """
     Returns the name of the given station ID.
@@ -225,7 +226,5 @@ def get_station_name(station, key):
     data = parse_json_site_response(r.text)
     if len(data) < 1:
         raise ApiException('Site name response from trafiklab was empty')
-
-    # TODO: cache this
 
     return data[0][u'name']

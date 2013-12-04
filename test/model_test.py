@@ -908,6 +908,7 @@ class MyPrettyPrinter(pprint.PrettyPrinter):
         return pprint.PrettyPrinter.format(self, object, context, maxlevels, level)
 
 
+@patch('slapi.model.cache.Memoize', Mock())
 class ModelTest(unittest.TestCase):
     def test_parse_displayrow(self):
         expected = [{u'destination': u'Hjulsta', u'displaytime': u'11 min', u'linenumber': u'10'},
