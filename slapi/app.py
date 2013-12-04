@@ -2,18 +2,17 @@
 
 import json
 import logging
-import requests
 
 from flask import Flask, request, make_response
 
-from model import parse_xml_response
+from model import parse_json_response
 
 app = Flask(__name__)
 app.debug = True
 log = logging.getLogger()
 
 
-METRO_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetDepartures.xml?&siteId=%s&key=%s'
+METRO_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetDepartures.json?&siteId=%s&key=%s'
 
 
 def get_args(args):
@@ -38,7 +37,7 @@ def sl(station):
         resp = make_response('Error while querying the trafiklab API', 503)
         return resp
 
-    data = parse_xml_response(r.text)
+    data = parse_json_response(r.text)
 
     if request.args.get('alt') == 'json':
         resp = make_response(json.dumps(data))
