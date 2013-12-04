@@ -5,7 +5,8 @@ import logging
 
 from flask import Flask, request, make_response
 
-from model import get_departures, ApiException
+from model import get_departures, get_station_name, ApiException
+from view import render_html_table
 
 app = Flask(__name__)
 app.debug = True
@@ -49,11 +50,6 @@ def get_int_argument(args, argname, default=0):
     return arg
 
 
-# TODO: create view.py
-def render(data):
-    return str(data)
-
-
 @app.route("/<int:station>")
 def sl(station):
     """
@@ -70,6 +66,7 @@ def sl(station):
     # fetch data from model given our station
     try:
         data = get_departures(station, key)
+        station_name = get_station_name(station, key)
     except ApiException, e:
         resp = make_response(str(e), 503)
         return resp
@@ -85,7 +82,7 @@ def sl(station):
         resp = make_response(json.dumps(data, ensure_ascii=False).encode('UTF-8'))
         resp.headers['Content-Type'] = 'application/json; charset=utf-8'
     else:
-        resp = make_response(render(data).encode('UTF-8'))
+        resp = make_response(render_html_table(station_name, data).encode('UTF-8'))
         resp.headers['Content-Type'] = 'text/html; charset=utf-8'
 
     return resp
