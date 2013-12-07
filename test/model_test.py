@@ -978,6 +978,22 @@ class MyPrettyPrinter(pprint.PrettyPrinter):
 
 @patch('slapi.model.cache.Memoize', Mock())
 class ModelTest(unittest.TestCase):
+    def test_compile_whitelist(self):
+        expected = {'Buses': set(['518', '119']),
+                    'Trains': set(['11', '10', '12'])}
+        self.assertEquals(model.compile_whitelist({'trains': '10,11,12',
+                                                   'buses': '119,518'}),
+                          expected)
+
+        expected = {'Buses': set(['518', '119']),
+                    'Trains': set(['11', '10', '12']),
+                    'Trams': set(['grisar'])}
+        self.assertEquals(model.compile_whitelist({'trains': '10,11,12',
+                                                   'buses': '119,518',
+                                                   'crap': 'johnny',
+                                                   'trams': 'grisar'}),
+                          expected)
+
     def test_parse_displayrow(self):
         expected = [{u'destination': u'Hjulsta', u'displaytime': u'11 min', u'linenumber': u'10'},
                     {u'destination': u'Hjulsta', u'displaytime': u'21 min.', u'linenumber': u'10'}]
@@ -1402,6 +1418,66 @@ class ModelTest(unittest.TestCase):
                       u'transportmode': u'TRAIN'}]
         expected.sort(key=lambda x: x['time'])
         out = model.parse_json_response(TRAIN_JSON_TESTINPUT)
+        out.sort(key=lambda x: x['time'])
+        self.assertEquals(out, expected)
+
+    @patch('slapi.model.get_now')
+    def test_parse_response_whitelist(self, now_mock):
+        expected = [{ u'destination': u'Bålsta',
+                      u'displaytime': u'1 min',
+                      u'linenumber': u'35',
+                      u'time': 1,
+                      u'transportmode': u'TRAIN'},
+                     {u'destination': u'Västerhaninge',
+                      u'displaytime': u'4 min',
+                      u'linenumber': u'35',
+                      u'time': 4,
+                      u'transportmode': u'TRAIN'},
+                     {u'destination': u'Kungsängen',
+                      u'displaytime': u'16 min',
+                      u'linenumber': u'35',
+                      u'time': 16,
+                      u'transportmode': u'TRAIN'},
+                     {u'destination': u'Nynäshamn',
+                      u'displaytime': u'19 min',
+                      u'linenumber': u'35',
+                      u'time': 19,
+                      u'transportmode': u'TRAIN'},
+                     {u'destination': u'Bålsta',
+                      u'displaytime': u'15:36',
+                      u'linenumber': u'35',
+                      u'time': 875,
+                      u'transportmode': u'TRAIN'},
+                     {u'destination': u'Västerhaninge',
+                      u'displaytime': u'15:39',
+                      u'linenumber': u'35',
+                      u'time': 878,
+                      u'transportmode': u'TRAIN'},
+                     {u'destination': u'Kungsängen',
+                      u'displaytime': u'15:51',
+                      u'linenumber': u'35',
+                      u'time': 890,
+                      u'transportmode': u'TRAIN'},
+                     {u'destination': u'Västerhaninge',
+                      u'displaytime': u'15:54',
+                      u'linenumber': u'35',
+                      u'time': 893,
+                      u'transportmode': u'TRAIN'},
+                     {u'destination': u'Jakobsberg',
+                      u'displaytime': u'15:58',
+                      u'linenumber': u'35',
+                      u'time': 897,
+                      u'transportmode': u'TRAIN'},
+                     {u'destination': u'Nynäshamn',
+                      u'displaytime': u'16:02',
+                      u'linenumber': u'35',
+                      u'time': 901,
+                      u'transportmode': u'TRAIN'}]
+        whitelist = {'Trains': set(['35']),
+                     'Trams': set(['none']),
+                     'Buses': set(['none'])}
+        expected.sort(key=lambda x: x['time'])
+        out = model.parse_json_response(TRAIN_JSON_TESTINPUT, whitelist)
         out.sort(key=lambda x: x['time'])
         self.assertEquals(out, expected)
 

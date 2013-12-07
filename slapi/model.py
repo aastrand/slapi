@@ -34,6 +34,19 @@ class ApiException(Exception):
     pass
 
 
+def compile_whitelist(args):
+    """
+    Helper function to compile a whitelist from the argument dict.
+    The whitelist maps transport_type => set([lines]):
+    {'Trams': set(['10', '20'])}
+    """
+    whitelist = {}
+    for t in TYPES:
+        if t.lower() in args:
+            whitelist[t] = set(args[t.lower()].split(','))
+    return whitelist
+
+
 def parse_displayrow(text):
     """
     Helper function to parse the text of the actual SL displays.
@@ -106,7 +119,7 @@ def convert_time(time):
     return int(time)
 
 
-def parse_json_response(text):
+def parse_json_response(text, whitelist=None):
     """
     Parses the JSON response from trafiklab and returns
     a normalized list of departures as dictioneries.
@@ -129,6 +142,9 @@ def parse_json_response(text):
                       u'stationname': u'Sundbybergs centrum',
                       u'time': 5}]
     """
+    if whitelist is None:
+        whitelist = {}
+
     jdata = json.loads(text)
     data = []
     # iterate over buses, trains, trams etc
@@ -146,6 +162,7 @@ def parse_json_response(text):
                     if value in item:
                         row[value.lower()] = item[value]
 
+                rows = []
                 # split up metro displayrows into individual elements,
                 # since they are encoded in the actual displayrows
                 # that you see when waiting at the station
@@ -155,23 +172,25 @@ def parse_json_response(text):
                         for display_row in parse_displayrow(item[value]):
                             row = copy.deepcopy(row)
                             row.update(display_row)
-                            data.append(row)
+                            rows.append(row)
                 # else (trains etc), extract time as normal
                 if TRAIN_DISPLAY in item:
                     row[u'displaytime'] = item[TRAIN_DISPLAY]
+                    rows.append(row)
+
+                # filter and convert time to minutes
+                for row in rows:
+                    # if we have a whitelist, skip if not in it
+                    if transport_type in whitelist and \
+                       row[u'linenumber'] not in whitelist[transport_type]:
+                        continue
+
+                    # filter out banned destinations
+                    if row[u'destination'] in BANNED_DESTINATIONS:
+                        continue
+
+                    row[u'time'] = convert_time(row[u'displaytime'])
                     data.append(row)
-
-    # convert time to minutes for sorting
-    # remove banned destinations
-    banned_elements = []
-    for element in data:
-        if element[u'destination'] in BANNED_DESTINATIONS:
-            banned_elements.append(element)
-        element[u'time'] = convert_time(element[u'displaytime'])
-
-    # deferred removal to not upset iteration
-    for element in banned_elements:
-        data.remove(element)
 
     return data
 
@@ -190,7 +209,7 @@ def parse_json_site_response(text):
     return data
 
 
-def get_departure(url_template, station, key):
+def get_departure(url_template, station, key, whitelist=None):
     """
     Helper function to get the parsed response for the given
     URL, station and API key.
@@ -199,19 +218,19 @@ def get_departure(url_template, station, key):
     if r.status_code != 200:
         raise ApiException('Error while querying the trafiklab API')
 
-    return parse_json_response(r.text)
+    return parse_json_response(r.text, whitelist)
 
 
 @cache.Memoize(10)
-def get_departures(station, key):
+def get_departures(station, key, whitelist=None):
     """
     Returns a list of all departures for the given station.
     Each element describes a departure, encoded as a dictionary.
     The list is ordered by departure time, ascending order.
     The API key needs to be a valid trafiklab API key.
     """
-    data = get_departure(METRO_URL_TEMPLATE, station, key)
-    data.extend(get_departure(TRAIN_URL_TEMPLATE, station, key))
+    data = get_departure(METRO_URL_TEMPLATE, station, key, whitelist)
+    data.extend(get_departure(TRAIN_URL_TEMPLATE, station, key, whitelist))
 
     # sort on time to departure
     data.sort(key=lambda x: x['time'])

@@ -133,3 +133,24 @@ class ModelTest(unittest.TestCase):
                                       'destination': 'lars'},
                                      {'time': 5, 'transportmode': 'TRAIN',
                                       'destination': 'jimmy'}])
+
+    @patch('slapi.app.get_station_name', lambda *x: 'test')
+    @patch('slapi.app.get_departures')
+    def test_args_whitelist(self, get_dep_mock):
+        get_dep_mock.return_value = {}
+
+        # remove buses and trams
+        with app.app.test_request_context('/9325?key=test123&alt=json&buses=none&trams=none'):
+            r = app.sl(9325)
+            self.assertEquals(r.status_code, 200)
+            expected =  {'Trams': set([u'none']), 'Buses': set([u'none'])}
+            self.assertEquals(get_dep_mock.call_args_list[0][0][2], expected)
+            get_dep_mock.reset_mock()
+
+        # filter metros
+        with app.app.test_request_context('/9325?key=test123&alt=json&metros=10,19'):
+            r = app.sl(9325)
+            self.assertEquals(r.status_code, 200)
+            expected =  {'Metros': set(['10', '19'])}
+            self.assertEquals(get_dep_mock.call_args_list[0][0][2], expected)
+            get_dep_mock.reset_mock()
