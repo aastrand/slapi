@@ -67,3 +67,40 @@ class ViewTest(unittest.TestCase):
         departure[u'transportmode'] = 'BLUEBUS'
         expected = '10'
         self.assertEquals(view.get_description(departure), expected)
+
+    def test_render(self):
+        data = [{ u'destination': u'Kungsträdg.',
+                  u'displaytime': u'5 min',
+                  u'groupofline': u'Tunnelbanans blå linje',
+                  u'linenumber': u'10',
+                  u'stationname': u'Sundbybergs centrum',
+                  u'time': 5,
+                  u'transportmode': u'METRO'},
+                 {u'destination': u'Kungsträdg.',
+                  u'displaytime': u'5 min',
+                  u'groupofline': u'Tunnelbanans blå linje',
+                  u'linenumber': u'10',
+                  u'stationname': u'Sundbybergs centrum',
+                  u'time': 5,
+                  u'transportmode': u'METRO'}]
+        expected = u"""<table id="sl_time_table">
+<tr><th style="width:3%"></th>
+<th style="width:75px;text-align:center"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/SL_logo.svg" height="30px" /></th>
+<th style="color:#888888;padding-left:20;font-size:24px">Sundbyberg </th>
+<th style="color:#888888;width:12%;text-align:center;font-size:24px">min.</th>
+</tr>
+<tr>
+<td style="background-color:blue"></td>
+<td class="projectLine" style="color:lightGray"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/T-bla.png" height="40px" /></td>
+<td class="projectDestination">Kungsträdg.</td>
+<td class="projectTime" style="text-align:center">5</td>
+</tr>
+<tr>
+<td style="background-color:blue"></td>
+<td class="projectLine" style="color:lightGray"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/T-bla.png" height="40px" /></td>
+<td class="projectDestination">Kungsträdg.</td>
+<td class="projectTime" style="text-align:center">5</td>
+</tr>
+</table>"""
+        self.assertEquals(view.render_html_table('Sundbyberg', data),
+                          expected)
