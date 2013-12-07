@@ -135,7 +135,12 @@ def parse_json_response(text):
     for transport_type, transport in jdata.get(u'Departure', jdata.get(u'DPS', {})).iteritems():
         # Metros/Metro sub iteration
         if transport_type in TYPES and transport:
-            for item in transport.values()[0]:
+            items = transport.values()[0]
+            # sometimes lone items are just a dict
+            if type(items) == dict:
+                items = [items]
+
+            for item in items:
                 row = {}
                 for value in METRO_VALUES:
                     if value in item:

@@ -893,6 +893,74 @@ SITE_JSON_TEST_INPUT = u"""
 }
 """
 
+TRAIN_JSON_ITERATION = u"""
+{
+    "DPS": {
+        "Buses": {
+            "DpsBus": [
+                {
+                    "Destination": "Odenplan",
+                    "DisplayTime": "05:00",
+                    "ExpectedDateTime": "2013-12-07T05:00:00",
+                    "LineNumber": "515",
+                    "SiteId": "9325",
+                    "StopAreaName": "Sundbybergs station",
+                    "StopAreaNumber": "12346",
+                    "TimeTabledDateTime": "2013-12-07T05:00:00",
+                    "TransportMode": "BUS"
+                },
+                {
+                    "Destination": "Odenplan",
+                    "DisplayTime": "05:30",
+                    "ExpectedDateTime": "2013-12-07T05:30:00",
+                    "LineNumber": "515",
+                    "SiteId": "9325",
+                    "StopAreaName": "Sundbybergs station",
+                    "StopAreaNumber": "12346",
+                    "TimeTabledDateTime": "2013-12-07T05:30:00",
+                    "TransportMode": "BUS"
+                }
+            ]
+        },
+        "ExecutionTime": "00:00:00.2968731",
+        "LatestUpdate": "2013-12-07T04:41:24.5604979+01:00",
+        "Metros": {},
+        "Trains": {
+            "DpsTrain": {
+                "Destination": "B\u00e5lsta",
+                "DisplayTime": "05:36",
+                "ExpectedDateTime": "2013-12-07T05:36:00",
+                "JourneyDirection": "2",
+                "LineNumber": "35",
+                "SiteId": "9325",
+                "StopAreaName": "Sundbyberg",
+                "StopAreaNumber": "0",
+                "TimeTabledDateTime": "2013-12-07T05:36:00",
+                "TransportMode": "TRAIN"
+            }
+        },
+        "Trams": {
+            "DpsTram": {
+                "Destination": "Solna centrum",
+                "DisplayTime": "05:39",
+                "ExpectedDateTime": "2013-12-07T05:39:00",
+                "GroupOfLine": "Tv\u00e4rbanan",
+                "JourneyDirection": "1",
+                "LineNumber": "22",
+                "SiteId": "9325",
+                "StopAreaName": "Sundbybergs centrum",
+                "StopAreaNumber": "0",
+                "TimeTabledDateTime": "2013-12-07T05:39:00",
+                "TransportMode": "TRAM"
+            }
+        },
+        "xmlns": "http://www1.sl.se/realtidws/",
+        "xmlnsxsd": "http://www.w3.org/2001/XMLSchema",
+        "xmlnsxsi": "http://www.w3.org/2001/XMLSchema-instance"
+    }
+}
+"""
+
 
 import pprint
 
@@ -1338,6 +1406,34 @@ class ModelTest(unittest.TestCase):
         self.assertEquals(out, expected)
 
     @patch('slapi.model.get_now')
+    def test_parse_train_response_iteration(self, now_mock):
+        expected = [{ u'destination': u'Odenplan',
+                      u'displaytime': u'05:00',
+                      u'linenumber': u'515',
+                      u'time': 239,
+                      u'transportmode': u'BUS'},
+                     {u'destination': u'Odenplan',
+                      u'displaytime': u'05:30',
+                      u'linenumber': u'515',
+                      u'time': 269,
+                      u'transportmode': u'BUS'},
+                     {u'destination': u'Bålsta',
+                      u'displaytime': u'05:36',
+                      u'linenumber': u'35',
+                      u'time': 275,
+                      u'transportmode': u'TRAIN'},
+                     {u'destination': u'Solna centrum',
+                      u'displaytime': u'05:39',
+                      u'groupofline': u'Tvärbanan',
+                      u'linenumber': u'22',
+                      u'time': 278,
+                      u'transportmode': u'TRAM'}]
+        expected.sort(key=lambda x: x['time'])
+        out = model.parse_json_response(TRAIN_JSON_ITERATION)
+        out.sort(key=lambda x: x['time'])
+        self.assertEquals(out, expected)
+
+    @patch('slapi.model.get_now')
     def test_convert_time(self, now_mock):
         now_mock.return_value = datetime.datetime(2013, 12, 01, 13, 02)
         self.assertEquals(model.convert_time('13:10'), 8)
@@ -1408,7 +1504,7 @@ class ModelTest(unittest.TestCase):
                           expected)
 
     @patch('slapi.model.requests')
-    def test_get_statio_name(self, req_mock):
+    def test_get_station_name(self, req_mock):
         req_mock.get = Mock()
         req_mock.get.return_value = Mock()
         req_mock.get.return_value.status_code = 500
