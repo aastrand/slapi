@@ -25,7 +25,7 @@ METRO_COLOR = {u'Tunnelbanans blå linje': 'blue',
                u'Tunnelbanans gröna linje': 'green',
                u'Tunnelbanans röda linje': 'red'}
 
-IMAGE_TEMPLATE = '<img src="http://www.carlfranzon.com/wp-content/uploads/%s" height="40px" />'
+IMAGE_TEMPLATE = '<img src="https://dl.dropboxusercontent.com/u/7823835/SL/%s" height="40px" />'
 TRANSPORT_IMAGE = {u'TRAIN': IMAGE_TEMPLATE % 'J.png',
                    u'Spårväg City': IMAGE_TEMPLATE % 'S.png',
                    u'Tvärbanan': IMAGE_TEMPLATE % 'L.png',

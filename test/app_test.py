@@ -18,25 +18,25 @@ RENDER_EXPECTED = """<table id="sl_time_table">
 </tr>
 <tr>
 <td style="background-color:mediumGray"></td>
-<td class="projectLine" style="color:lightGray"><img src="http://www.carlfranzon.com/wp-content/uploads/J.png" height="40px" /></td>
+<td class="projectLine" style="color:lightGray"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/J.png" height="40px" /></td>
 <td class="projectDestination">kongo</td>
 <td class="projectTime" style="text-align:center">2</td>
 </tr>
 <tr>
 <td style="background-color:mediumGray"></td>
-<td class="projectLine" style="color:lightGray"><img src="http://www.carlfranzon.com/wp-content/uploads/J.png" height="40px" /></td>
+<td class="projectLine" style="color:lightGray"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/J.png" height="40px" /></td>
 <td class="projectDestination">lars</td>
 <td class="projectTime" style="text-align:center">3</td>
 </tr>
 <tr>
 <td style="background-color:mediumGray"></td>
-<td class="projectLine" style="color:lightGray"><img src="http://www.carlfranzon.com/wp-content/uploads/J.png" height="40px" /></td>
+<td class="projectLine" style="color:lightGray"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/J.png" height="40px" /></td>
 <td class="projectDestination">jimmy</td>
 <td class="projectTime" style="text-align:center">5</td>
 </tr>
 <tr>
 <td style="background-color:mediumGray"></td>
-<td class="projectLine" style="color:lightGray"><img src="http://www.carlfranzon.com/wp-content/uploads/J.png" height="40px" /></td>
+<td class="projectLine" style="color:lightGray"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/J.png" height="40px" /></td>
 <td class="projectDestination">jeppson</td>
 <td class="projectTime" style="text-align:center">10</td>
 </tr>

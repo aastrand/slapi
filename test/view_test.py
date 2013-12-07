@@ -52,15 +52,15 @@ class ViewTest(unittest.TestCase):
                     u'time': 5,
                     u'transportmode': u'METRO'}
 
-        expected = '<img src="http://www.carlfranzon.com/wp-content/uploads/T-bla.png" height="40px" />'
+        expected = '<img src="https://dl.dropboxusercontent.com/u/7823835/SL/T-bla.png" height="40px" />'
         self.assertEquals(view.get_description(departure), expected)
 
         departure[u'groupofline'] =  u'Tunnelbanans gröna linje'
-        expected = '<img src="http://www.carlfranzon.com/wp-content/uploads/T-gron.png" height="40px" />'
+        expected = '<img src="https://dl.dropboxusercontent.com/u/7823835/SL/T-gron.png" height="40px" />'
         self.assertEquals(view.get_description(departure), expected)
 
         departure[u'groupofline'] =  u'Tunnelbanans röda linje'
-        expected = '<img src="http://www.carlfranzon.com/wp-content/uploads/T-rod.png" height="40px" />'
+        expected = '<img src="https://dl.dropboxusercontent.com/u/7823835/SL/T-rod.png" height="40px" />'
         self.assertEquals(view.get_description(departure), expected)
 
         del departure[u'groupofline']
