@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import copy
 import datetime
 import unittest
 
@@ -976,7 +977,6 @@ class MyPrettyPrinter(pprint.PrettyPrinter):
         return pprint.PrettyPrinter.format(self, object, context, maxlevels, level)
 
 
-@patch('slapi.model.cache.Memoize', Mock())
 class ModelTest(unittest.TestCase):
     def test_compile_whitelist(self):
         expected = {'Buses': set(['518', '119']),
@@ -1576,6 +1576,88 @@ class ModelTest(unittest.TestCase):
             self.assertEquals(type(item), dict)
             self.assertTrue(len(item) > 0)
 
+    @patch('slapi.model.get_now')
+    def test_handle_flapping_displays(self, now_mock):
+        now_mock.return_value = datetime.datetime(2013, 12, 01, 00, 26)
+
+        cached = [{ u'destination': u'Kungsträdg.',
+                      u'displaytime': u'5 min',
+                      u'groupofline': u'Tunnelbanans blå linje',
+                      u'linenumber': u'10',
+                      u'stationname': u'Sundbybergs centrum',
+                      u'time': 2,
+                      u'transportmode': u'METRO'},
+                     {u'destination': u'Kungsträdg.',
+                      u'displaytime': u'5 min',
+                      u'groupofline': u'Tunnelbanans blå linje',
+                      u'linenumber': u'10',
+                      u'stationname': u'Sundbybergs centrum',
+                      u'time': 5,
+                      u'transportmode': u'METRO'},
+                     {u'destination': u'Kungsträdg.',
+                      u'displaytime': u'12 min.',
+                      u'groupofline': u'Tunnelbanans blå linje',
+                      u'linenumber': u'10',
+                      u'stationname': u'Sundbybergs centrum',
+                      u'time': 12,
+                      u'transportmode': u'METRO'},
+                     {u'destination': u'Hjulsta',
+                      u'displaytime': u'1 min',
+                      u'groupofline': u'Tunnelbanans blå linje',
+                      u'linenumber': u'10',
+                      u'stationname': u'Sundbybergs centrum',
+                      u'time': 4,
+                      u'transportmode': u'METRO'},
+                     {u'destination': u'Hjulsta',
+                      u'displaytime': u'8 min',
+                      u'groupofline': u'Tunnelbanans blå linje',
+                      u'linenumber': u'10',
+                      u'stationname': u'Sundbybergs centrum',
+                      u'time': 8,
+                      u'transportmode': u'METRO'},
+                     {u'destination': u'Hjulsta',
+                      u'displaytime': u'16 min.',
+                      u'groupofline': u'Tunnelbanans blå linje',
+                      u'linenumber': u'10',
+                      u'stationname': u'Sundbybergs centrum',
+                      u'time': 16,
+                      u'transportmode': u'METRO'}]
+
+        # let two minutes pass
+        data = copy.deepcopy(cached)
+        for d in data:
+            d[u'time'] -= 2
+
+        # first time, no flaps
+        self.assertEquals(model.handle_flapping_displays('4711', data, {}),
+                          [])
+
+        # make the two hjulsta departures flap
+        ts = datetime.datetime(2013, 12, 01, 00, 24)
+        expected = []
+        expected.append(data.pop(4))
+        expected.append(data.pop(4))
+        expected[0][u'firstseen'] = ts
+        expected[1][u'firstseen'] = ts
+        expected[0][u'firsttime'] = expected[0][u'time'] + 2
+        expected[1][u'firsttime'] = expected[1][u'time'] + 2
+        cache = {'4711': (ts, cached)}
+
+        # expect them back
+        self.assertEquals(model.handle_flapping_displays('4711', data, cache),
+                          expected)
+
+        # age the cache 10 mins, now only the 16 min departure is relevant
+        ts = datetime.datetime(2013, 12, 01, 00, 24)
+        cache = {'4711': (ts, cached)}
+        expected.pop(0)
+        expected[0][u'time'] -= 8
+        expected[0][u'firstseen'] = ts
+        expected[0][u'firsttime'] = expected[0][u'time'] + 10
+        now_mock.return_value = datetime.datetime(2013, 12, 01, 00, 34)
+        self.assertEquals(model.handle_flapping_displays('4711', data, cache),
+                          expected)
+
     def test_parse_site_response(self):
         expected = [{u'name': u'Solna Business Park (Solna)'}]
         self.assertEquals(model.parse_json_site_response(SITE_JSON_TEST_INPUT),
@@ -1600,6 +1682,8 @@ class ModelTest(unittest.TestCase):
 
         self.assertRaises(model.ApiException, model.get_station_name,
                           31337, 'deadbeef')
+
+        model.cache.clear()
 
         responses = [SITE_JSON_TEST_INPUT]
 

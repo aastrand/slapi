@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import json
 import unittest
 
@@ -84,6 +85,9 @@ class ModelTest(unittest.TestCase):
 
         # json rendering
         with app.app.test_request_context('/v1/station/9325/departures?key=test123&alt=json'):
+            get_dep_mock.return_value[3]['crap'] = datetime.datetime(2013, 01,
+                                                                     01, 00,
+                                                                     00, 00)
             r = app.departures(9325)
             self.assertEquals(r.status_code, 200)
             resp = json.loads(r.response[0])
@@ -94,7 +98,9 @@ class ModelTest(unittest.TestCase):
                                      {'time': 5, 'transportmode': 'TRAIN',
                                       'destination': 'jimmy'},
                                      {'time': 10, 'transportmode': 'TRAIN',
-                                      'destination': 'jeppson'}])
+                                      'destination': 'jeppson',
+                                      'crap': u'2013-01-01 00:00:00'}])
+            del get_dep_mock.return_value[3]['crap']
 
         # limit
         with app.app.test_request_context('/v1/station/9325/departures?key=test123&alt=json&limit=crap'):

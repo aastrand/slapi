@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import datetime
 import json
 import logging
 
@@ -59,6 +60,15 @@ def get_int_argument(args, argname, default=0):
     return arg
 
 
+def json_default(obj):
+    """
+    Default handler for the json dumping.
+    Sometimes the departures contain datetimes.
+    """
+    if isinstance(obj, datetime.datetime):
+        return str(obj)
+
+
 @app.route("/v1/station/<int:station>/departures")
 def departures(station):
     """
@@ -89,7 +99,8 @@ def departures(station):
 
     # render results and send response
     if request.args.get('alt') == 'json':
-        resp = make_response(json.dumps(data, ensure_ascii=False).encode('UTF-8'))
+        resp = make_response(json.dumps(data, ensure_ascii=False,
+                                        default=json_default).encode('UTF-8'))
         resp.headers['Content-Type'] = 'application/json; charset=utf-8'
     else:
         resp = make_response(render_html_table(station_name, data).encode('UTF-8'))

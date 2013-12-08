@@ -5,9 +5,13 @@ import datetime
 import json
 import logging
 import re
+import threading
+import time
 
 import gocept.cache.method as cache
 import requests
+
+log = logging.getLogger()
 
 # we only want data for these types, errors and what not begone
 TYPES = set(['Buses', 'Metros', 'Trains', 'Trams'])
@@ -28,6 +32,30 @@ STATION_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetSite.json?&statio
 
 # i dont care about fjärrtåg
 BANNED_DESTINATIONS = set([u'Fjärrtåg'])
+
+
+cached_data = {}
+
+
+def reap_cache():
+    """
+    Cache eviction loop.
+    Will delete stale data and hopes to prevent memory leaks.
+    """
+    while True:
+        time.sleep(60)
+        now = get_now()
+        count = 0
+        for station, (timestamp, data) in cached_data.iteritems():
+            if timestamp - now > datetime.timedelta(minutes=15):
+                count += 1
+                del cached_data[station]
+        log.info('Reaper evicted %d entries from cache' % count)
+
+
+reaper = threading.Thread(target=reap_cache)
+reaper.daemon = True
+reaper.start()
 
 
 class ApiException(Exception):
@@ -212,19 +240,67 @@ def parse_json_site_response(text):
     return data
 
 
+@cache.Memoize(60)
+def query_trafiklab(url):
+    """
+    Helper function for querying the trafiklab HTTP APIs.
+    """
+    r = requests.get(url)
+    if r.status_code != 200:
+        raise ApiException('Error while querying the trafiklab API')
+    return r.text
+
+
 def get_departure(url_template, station, key, whitelist=None):
     """
     Helper function to get the parsed response for the given
     URL, station and API key.
     """
-    r = requests.get(url_template % (station, key))
-    if r.status_code != 200:
-        raise ApiException('Error while querying the trafiklab API')
-
-    return parse_json_response(r.text, whitelist)
+    resp = query_trafiklab(url_template % (station, key))
+    return parse_json_response(resp, whitelist)
 
 
-@cache.Memoize(10)
+def handle_flapping_displays(station, data, cached_data):
+    """
+    Function for finding out which (if any) of the cached departures
+    should actually be in the current data list, but are hidden
+    since their displayrows flapped with warnings about pickpockets.
+    """
+    timestamp, old_data = cached_data.get(station, (None, None))
+    keep = []
+
+    def calc_dt(ts):
+        return int(round((get_now() - ts).total_seconds() / 60.0))
+
+    if timestamp is not None:
+        # convert and round the time diff to minute integer
+        dt = calc_dt(timestamp)
+        for old_d in old_data:
+            # if the departure has already left, lets not care
+            if old_d[u'transportmode'] == u'METRO' and old_d[u'time'] > dt:
+                # calculate deltatime more or less accurately?
+                # lists are expected to be very short, (2-4 elements)
+                # so it's ok to O(n^2) here
+                # find the cached departure in the new list:
+                for d in data:
+                    # we have the departure in our new list, dont do anything
+                    # allow +/- 1 minute difference since we'll accumulate
+                    # errors in the delta calc
+                    if d[u'destination'] == old_d[u'destination'] and \
+                       d[u'linenumber'] == old_d[u'linenumber'] and \
+                       -2 < d[u'time'] + dt - old_d[u'time'] < 2:
+                        break
+                else:
+                    # hey, we used to have this and now we dont
+                    if u'firstseen' not in old_d:
+                        old_d[u'firstseen'] = timestamp
+                        old_d[u'firsttime'] = old_d[u'time']
+
+                    old_d[u'time'] = old_d[u'firsttime'] - calc_dt(old_d[u'firstseen'])
+                    keep.append(old_d)
+    return keep
+
+
 def get_departures(station, key, whitelist=None):
     """
     Returns a list of all departures for the given station.
@@ -235,8 +311,13 @@ def get_departures(station, key, whitelist=None):
     data = get_departure(METRO_URL_TEMPLATE, station, key, whitelist)
     data.extend(get_departure(TRAIN_URL_TEMPLATE, station, key, whitelist))
 
+    # see if we have cached older entries which are still relevant
+    data.extend(handle_flapping_displays(station, data, cached_data))
+
     # sort on time to departure
     data.sort(key=lambda x: x['time'])
+
+    cached_data[station] = (get_now(), data)
 
     return data
 
@@ -246,11 +327,8 @@ def get_station_name(station, key):
     """
     Returns the name of the given station ID.
     """
-    r = requests.get(STATION_URL_TEMPLATE % (station, key))
-    if r.status_code != 200:
-        raise ApiException('Error while querying the trafiklab API')
-
-    data = parse_json_site_response(r.text)
+    resp = query_trafiklab(STATION_URL_TEMPLATE % (station, key))
+    data = parse_json_site_response(resp)
     if len(data) < 1:
         raise ApiException('Site name response from trafiklab was empty')
 
