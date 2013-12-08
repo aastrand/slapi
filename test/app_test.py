@@ -53,16 +53,16 @@ class ModelTest(unittest.TestCase):
         get_dep_mock.side_effect = raiseit
 
         with app.app.test_request_context('/crap'):
-            r = app.sl('crap')
+            r = app.station('crap')
             self.assertEquals(r.status_code, 400)
 
-        with app.app.test_request_context('/9325'):
-            r = app.sl(9325)
+        with app.app.test_request_context('/v1/station/9325'):
+            r = app.station(9325)
             self.assertEquals(r.response,
                               ['Missing mandatory argument: key'])
 
-        with app.app.test_request_context('/9325?key=test123'):
-            r = app.sl(9325)
+        with app.app.test_request_context('/v1/station/9325/departures?key=test123'):
+            r = app.departures(9325)
             self.assertEquals(r.status_code, 503)
 
     @patch('slapi.app.get_station_name', lambda *x: 'test')
@@ -77,14 +77,14 @@ class ModelTest(unittest.TestCase):
                                      {'time': 10, 'transportmode': 'TRAIN',
                                       'destination': 'jeppson'}]
 
-        with app.app.test_request_context('/9325?key=test123'):
-            r = app.sl(9325)
+        with app.app.test_request_context('/v1/station/9325/departures?key=test123'):
+            r = app.departures(9325)
             self.assertEquals(r.status_code, 200)
             self.assertEquals(r.response, [RENDER_EXPECTED])
 
         # json rendering
-        with app.app.test_request_context('/9325?key=test123&alt=json'):
-            r = app.sl(9325)
+        with app.app.test_request_context('/v1/station/9325/departures?key=test123&alt=json'):
+            r = app.departures(9325)
             self.assertEquals(r.status_code, 200)
             resp = json.loads(r.response[0])
             self.assertEquals(resp, [{'time': 2, 'transportmode': 'TRAIN',
@@ -97,14 +97,14 @@ class ModelTest(unittest.TestCase):
                                       'destination': 'jeppson'}])
 
         # limit
-        with app.app.test_request_context('/9325?key=test123&alt=json&limit=crap'):
-            r = app.sl(9325)
+        with app.app.test_request_context('/v1/station/9325/departures?key=test123&alt=json&limit=crap'):
+            r = app.departures(9325)
             self.assertEquals(r.status_code, 400)
             self.assertEquals(r.response,
                               ['Error while parsing argument limit'])
 
-        with app.app.test_request_context('/9325?key=test123&alt=json&limit=3'):
-            r = app.sl(9325)
+        with app.app.test_request_context('/v1/station/9325/departures?key=test123&alt=json&limit=3'):
+            r = app.departures(9325)
             self.assertEquals(r.status_code, 200)
             resp = json.loads(r.response[0])
             self.assertEquals(resp, [{'time': 2, 'transportmode': 'TRAIN',
@@ -115,8 +115,8 @@ class ModelTest(unittest.TestCase):
                                       'destination': 'jimmy'}])
 
         # distance
-        with app.app.test_request_context('/9325?key=test123&alt=json&distance=3'):
-            r = app.sl(9325)
+        with app.app.test_request_context('/v1/station/9325/departures?key=test123&alt=json&distance=3'):
+            r = app.departures(9325)
             self.assertEquals(r.status_code, 200)
             resp = json.loads(r.response[0])
             self.assertEquals(resp, [{'time': 5, 'transportmode': 'TRAIN',
@@ -125,8 +125,8 @@ class ModelTest(unittest.TestCase):
                                       'destination': 'jeppson'}])
 
         # combine
-        with app.app.test_request_context('/9325?key=test123&alt=json&distance=2&limit=2'):
-            r = app.sl(9325)
+        with app.app.test_request_context('/v1/station/9325/departures?key=test123&alt=json&distance=2&limit=2'):
+            r = app.departures(9325)
             self.assertEquals(r.status_code, 200)
             resp = json.loads(r.response[0])
             self.assertEquals(resp, [{'time': 3, 'transportmode': 'TRAIN',
@@ -140,17 +140,38 @@ class ModelTest(unittest.TestCase):
         get_dep_mock.return_value = {}
 
         # remove buses and trams
-        with app.app.test_request_context('/9325?key=test123&alt=json&buses=none&trams=none'):
-            r = app.sl(9325)
+        with app.app.test_request_context('/v1/station/9325/departures?key=test123&alt=json&buses=none&trams=none'):
+            r = app.departures(9325)
             self.assertEquals(r.status_code, 200)
             expected =  {'Trams': set([u'none']), 'Buses': set([u'none'])}
             self.assertEquals(get_dep_mock.call_args_list[0][0][2], expected)
             get_dep_mock.reset_mock()
 
         # filter metros
-        with app.app.test_request_context('/9325?key=test123&alt=json&metros=10,19'):
-            r = app.sl(9325)
+        with app.app.test_request_context('/v1/station/9325/departures?key=test123&alt=json&metros=10,19'):
+            r = app.departures(9325)
             self.assertEquals(r.status_code, 200)
             expected =  {'Metros': set(['10', '19'])}
             self.assertEquals(get_dep_mock.call_args_list[0][0][2], expected)
             get_dep_mock.reset_mock()
+
+    @patch('slapi.app.get_station_name')
+    def test_station(self, get_station_mock):
+        with app.app.test_request_context('/crap'):
+            r = app.station('crap')
+            self.assertEquals(r.status_code, 400)
+
+        get_station_mock.return_value = 'test'
+        with app.app.test_request_context('/v1/station/9325?key=test123'):
+            r = app.station(9325)
+            self.assertEquals(r.status_code, 200)
+            resp = json.loads(r.response[0])
+            self.assertEquals(resp, {u'siteid': '9325', u'name': 'test'})
+
+        def raiseit(*args):
+            raise model.ApiException('crap')
+        get_station_mock.side_effect = raiseit
+
+        with app.app.test_request_context('/v1/station/9325?key=test123'):
+            r = app.station(9325)
+            self.assertEquals(r.status_code, 503)

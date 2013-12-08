@@ -59,11 +59,10 @@ def get_int_argument(args, argname, default=0):
     return arg
 
 
-@app.route("/<int:station>")
-def sl(station):
+@app.route("/v1/station/<int:station>/departures")
+def departures(station):
     """
-    Entry point for the API.
-    Takes a single argument, the station resource as an integer.
+    Returns the departures for the given station.
     """
     # unpack arguments
     try:
@@ -95,6 +94,35 @@ def sl(station):
     else:
         resp = make_response(render_html_table(station_name, data).encode('UTF-8'))
         resp.headers['Content-Type'] = 'text/html; charset=utf-8'
+
+    return resp
+
+
+@app.route("/v1/station/<int:station>")
+def station(station):
+    """
+    Returns the name for the given station.
+    """
+    # unpack arguments
+    try:
+        key, _, _, _ = get_args(request.args)
+    except ValueError, e:
+        log.exception(str(e))
+        resp = make_response(str(e), 400)
+        return resp
+
+    # fetch data from model given our station
+    try:
+        station_name = get_station_name(station, key)
+    except ApiException, e:
+        log.exception(str(e))
+        resp = make_response(str(e), 503)
+        return resp
+
+    data = {'name': station_name, 'siteid': str(station)}
+    # render results and send response
+    resp = make_response(json.dumps(data, ensure_ascii=False).encode('UTF-8'))
+    resp.headers['Content-Type'] = 'application/json; charset=utf-8'
 
     return resp
 

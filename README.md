@@ -15,7 +15,7 @@ The HTML renderer can be used as a backend for [Status Board](https://itunes.app
 
 ## Installation
 
-1) Install the requirements using pip: 
+1) Install the requirements using pip:
 
 ```
 $ pip install -r requirements.txt
@@ -33,11 +33,26 @@ I recommend running it some WSGI container. I personally [run flask inside apach
 3) Add queries to whatever you have reading the API. In Status Board, add a URL like below to a custom Table widget:
 
 ```
-http://yourhost.se:port/station-id?key=key&distance=5&buses=none&trams=none
+http://yourhost.se:port/v1/station-id/departures?key=key&distance=5&buses=none&trams=none
 ```
 
 The station ID is a [unique integer ID](http://console.apihq.com/sl-realtidsinformation) for the station you want departures for.
- 
+
+## API calls
+
+The API has two valid calls:
+
+1) Name of a given station:
+
+```
+/v1/station/<id>
+```
+
+2) Departures for a given station:
+
+```
+/v1/station/<id>/departures
+```
 
 ## API arguments
 
@@ -53,6 +68,9 @@ The API path is simply the station id (see above), the arguments are as follows:
 | metros   | comma separated list | yes       | Only show these lines for this transportation type. Example: metros=10,20,30. |
 | trains   | comma separated list | yes       | Only show these lines for this transportation type. Example: trains=10,20,30. |
 | trams    | comma separated list | yes       | Only show these lines for this transportation type. Example: trams=10,20,30. |
+
+
+The arguments are accepted for all calls, but may not have any effect.
 
 
 ## Bugs
