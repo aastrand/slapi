@@ -57,6 +57,9 @@ def parse_displayrow(text):
                           u'displaytime': '8 min.'}
 
     """
+    # sometimes displayrows are empty dicts
+    if isinstance(text, dict):
+        return []
     # encode, otherwise we dont match Kungsträdgården etc
     text = text.encode('UTF-8')
     data = []

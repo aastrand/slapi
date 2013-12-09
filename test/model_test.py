@@ -1025,6 +1025,8 @@ class ModelTest(unittest.TestCase):
         self.assertEquals(model.parse_displayrow(u'10 Hjulsta   8 min,      10 Hjulsta  16 min.'),
                           expected)
 
+        self.assertEquals(model.parse_displayrow({}), [])
+
     @patch('slapi.model.get_now')
     def test_parse_response(self, now_mock):
         now_mock.return_value = datetime.datetime(2013, 12, 01, 00, 30)
