@@ -879,18 +879,49 @@ TRAIN_JSON_TESTINPUT = u"""
 
 SITE_JSON_TEST_INPUT = u"""
 {
-  "Hafas": {
-    "xmlnsxsi": "http://www.w3.org/2001/XMLSchema-instance",
-    "xmlnsxsd": "http://www.w3.org/2001/XMLSchema",
-    "xmlns": "http://www1.sl.se/realtidws/",
-    "ExecutionTime": "00:00:00.0781270",
-    "Sites": {
-      "Site": {
-        "Number": "5119",
-        "Name": "Solna Business Park (Solna)"
-      }
+  "ResponseData": [
+    {
+      "Y": "59360842",
+      "X": "17969256",
+      "Type": "Station",
+      "SiteId": "9325",
+      "Name": "Sundbyberg (Sundbyberg)"
     }
-  }
+  ],
+  "ExecutionTime": 0,
+  "Message": null,
+  "StatusCode": 0
+}
+"""
+
+SITE_JSON_TEST_INPUT_LONG = u"""
+{
+  "ResponseData": [
+    {
+      "Y": "59360842",
+      "X": "17969256",
+      "Type": "Station",
+      "SiteId": "9325",
+      "Name": "Sundbyberg (Sundbyberg)"
+    },
+    {
+      "Y": "59360842",
+      "X": "17969256",
+      "Type": "Station",
+      "SiteId": "9325",
+      "Name": "Sundbybergs centrum (Sundbyberg)"
+    },
+    {
+      "Y": "59360842",
+      "X": "17969256",
+      "Type": "Station",
+      "SiteId": "9325",
+      "Name": "Sundbybergs station (Sundbyberg)"
+    }
+  ],
+  "ExecutionTime": 0,
+  "Message": null,
+  "StatusCode": 0
 }
 """
 
@@ -1659,8 +1690,18 @@ class ModelTest(unittest.TestCase):
                           expected)
 
     def test_parse_site_response(self):
-        expected = [{u'name': u'Solna Business Park (Solna)'}]
+        expected = [{u'name': u'Sundbyberg (Sundbyberg)'}]
         self.assertEquals(model.parse_json_site_response(SITE_JSON_TEST_INPUT),
+                          expected)
+
+        expected = [{u'name': u'Sundbyberg (Sundbyberg)'},
+                    {u'name': u'Sundbybergs centrum (Sundbyberg)'},
+                    {u'name': u'Sundbybergs station (Sundbyberg)'}]
+        self.assertEquals(model.parse_json_site_response(SITE_JSON_TEST_INPUT_LONG),
+                          expected)
+
+        expected = []
+        self.assertEquals(model.parse_json_site_response('{}'),
                           expected)
 
     @patch('slapi.model.requests')
@@ -1696,4 +1737,4 @@ class ModelTest(unittest.TestCase):
         req_mock.get = mock_get
 
         self.assertEquals(model.get_station_name(31337, 'deadbeef'),
-                          u'Solna Business Park (Solna)')
+                          u'Sundbyberg (Sundbyberg)')

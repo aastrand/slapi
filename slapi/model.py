@@ -28,7 +28,7 @@ DISPLAY_NAME_RE = re.compile('^([0-9]+) +([a-zA-ZåäöÅÄÖ\.]+) *([0-9]+[:0-9
 
 METRO_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetDepartures.json?&siteId=%s&key=%s'
 TRAIN_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetDpsDepartures.json?&siteId=%s&key=%s&timeWindow=60'
-STATION_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetSite.json?&stationSearch=%s&key=%s'
+STATION_URL_TEMPLATE = 'https://api.sl.se/api2/typeahead.json?key=%s&searchstring=%s&stationsonly=true&maxresults=1'
 
 # i dont care about fjärrtåg
 BANNED_DESTINATIONS = set([u'Fjärrtåg'])
@@ -233,10 +233,9 @@ def parse_json_site_response(text):
     """
     jdata = json.loads(text)
     data = []
-    for site_type, site in jdata.get(u'Hafas', {}).iteritems():
-        if site_type == u'Sites':
-            for item in site.values():
-                data.append({u'name': item['Name']})
+    for site in jdata.get(u'ResponseData', {}):
+        if site.get(u'Type') == 'Station':
+            data.append({u'name': site['Name']})
     return data
 
 
@@ -327,7 +326,7 @@ def get_station_name(station, key):
     """
     Returns the name of the given station ID.
     """
-    resp = query_trafiklab(STATION_URL_TEMPLATE % (station, key))
+    resp = query_trafiklab(STATION_URL_TEMPLATE % (key, station))
     data = parse_json_site_response(resp)
     if len(data) < 1:
         raise ApiException('Site name response from trafiklab was empty')
