@@ -35,7 +35,17 @@ station-key: <key to your trafikab platsuppslagnings api>
 $ PYTHONPATH=. python slapi/app.py
 ```
 
-I recommend running it some WSGI container. I personally [run flask inside apache](http://flask.pocoo.org/docs/deploying/mod_wsgi/) using mod_wsgi.
+I recommend running it in some WSGI container. I personally [run flask inside apache](http://flask.pocoo.org/docs/deploying/mod_wsgi/) using mod_wsgi. My wsgi scripts looks something like:
+
+```
+$ cat sl.wsgi
+import sys
+sys.path.insert(0, <path to code>)
+
+from app import configure
+from app import app as application
+configure('config.yaml') # this is loaded from the webserver cwd, use absolute paths if you want
+```
 
 
 4) Add queries to whatever you have reading the API. In Status Board, add a URL like below to a custom Table widget:

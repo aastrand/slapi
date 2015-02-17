@@ -126,7 +126,11 @@ def station(station):
     return resp
 
 
-if __name__ == "__main__":
-    config = load_config('config.yaml')
+def configure(config_file):
+    config = load_config(config_file)
     app.api_config = config
+
+
+if __name__ == "__main__":
+    configure('config.yaml')
     app.run()
