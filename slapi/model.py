@@ -234,7 +234,7 @@ def query_trafiklab(url):
 def get_departure(url_template, station, key, whitelist=None):
     """
     Helper function to get the parsed response for the given
-    URL, station and API key.
+    URL, station and departure API key.
     """
     resp = query_trafiklab(url_template % (key, station))
     return parse_json_response(resp, whitelist)
@@ -286,7 +286,7 @@ def get_departures(station, key, whitelist=None):
     Returns a list of all departures for the given station.
     Each element describes a departure, encoded as a dictionary.
     The list is ordered by departure time, ascending order.
-    The API key needs to be a valid trafiklab API key.
+    The API key needs to be a valid trafiklab departure API key.
     """
     data = get_departure(DEPARTURE_URL_TEMPLATE, station, key, whitelist)
 
@@ -305,6 +305,7 @@ def get_departures(station, key, whitelist=None):
 def get_station_name(station, key):
     """
     Returns the name of the given station ID.
+    The API key needs to be a valid trafiklab platsuppslagnings API key.
     """
     resp = query_trafiklab(STATION_URL_TEMPLATE % (key, station))
     data = parse_json_site_response(resp)
