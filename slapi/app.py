@@ -9,6 +9,7 @@ from flask import Flask, request, make_response
 from model import (get_departures, get_station_name, ApiException,
                    compile_whitelist)
 from view import render_html_table
+from util import load_config
 
 app = Flask(__name__)
 app.debug = True
@@ -19,7 +20,6 @@ def get_args(args):
     """
     Helper function to extract the mandatory (*) and optional (-)
     arguments to this web API:
-    * key      - trafiklab API key
     - distance - distance to the station in minutes, will filter out
                  departures that will be missed
     - limit    - limit the amount of departures in the response
@@ -31,15 +31,11 @@ def get_args(args):
     - trams
 
     """
-    key = args.get('key')
-    if key is None:
-        raise ValueError('Missing mandatory argument: key')
-
     distance = get_int_argument(request.args, 'distance', 0)
     limit = get_int_argument(request.args, 'limit', None)
     whitelist = compile_whitelist(request.args)
 
-    return key, distance, limit, whitelist
+    return distance, limit, whitelist
 
 
 def get_int_argument(args, argname, default=0):
@@ -76,7 +72,7 @@ def departures(station):
     """
     # unpack arguments
     try:
-        key, distance, limit, whitelist = get_args(request.args)
+        distance, limit, whitelist = get_args(request.args)
     except ValueError, e:
         log.exception(str(e))
         resp = make_response(str(e), 400)
@@ -84,8 +80,8 @@ def departures(station):
 
     # fetch data from model given our station
     try:
-        data = get_departures(station, key, whitelist)
-        station_name = get_station_name(station, key)
+        data = get_departures(station, app.api_config['departure-key'], whitelist)
+        station_name = get_station_name(station, app.api_config['station-key'])
     except ApiException, e:
         log.exception(str(e))
         resp = make_response(str(e), 503)
@@ -114,17 +110,9 @@ def station(station):
     """
     Returns the name for the given station.
     """
-    # unpack arguments
-    try:
-        key, _, _, _ = get_args(request.args)
-    except ValueError, e:
-        log.exception(str(e))
-        resp = make_response(str(e), 400)
-        return resp
-
     # fetch data from model given our station
     try:
-        station_name = get_station_name(station, key)
+        station_name = get_station_name(station, app.api_config['station-key'])
     except ApiException, e:
         log.exception(str(e))
         resp = make_response(str(e), 503)
@@ -138,5 +126,11 @@ def station(station):
     return resp
 
 
+def configure(config_file):
+    config = load_config(config_file)
+    app.api_config = config
+
+
 if __name__ == "__main__":
+    configure('config.yaml')
     app.run()

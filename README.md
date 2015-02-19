@@ -7,7 +7,7 @@ Aggregating API and view for the trafiklab realtime APIs
 
 This API is inspired by [SB\_SL](https://github.com/carlfranzon/SB_SL). I wanted caching, some filtering and prefer python to PHP, so I wrote this. Images and idea totally stolen from him though.
 
-It tries to be a HTTP REST JSON/HTML API aggregator for the [trafiklab APIs](http://http://www.trafiklab.se/api/sl-realtidsinfo).
+It tries to be a HTTP REST JSON/HTML API aggregator for the [trafiklab APIs](http://http://www.trafiklab.se).
 
 The HTML renderer can be used as a backend for [Status Board](https://itunes.apple.com/us/app/status-board/id449955536?mt=8&ign-mpt=uo%3D4) custom tables.
 
@@ -21,19 +21,37 @@ The HTML renderer can be used as a backend for [Status Board](https://itunes.app
 $ pip install -r requirements.txt
 ```
 
-2) To run the flask server as is:
+2) Create a YAML configuration file named config.yaml, looking something like:
+
+```
+$ cat config.yaml
+departure-key: <key to your trafiklab realtidsinformation 3 api>
+station-key: <key to your trafikab platsuppslagnings api>
+```
+
+3) To run the flask server as is:
 
 ```
 $ PYTHONPATH=. python slapi/app.py
 ```
 
-I recommend running it some WSGI container. I personally [run flask inside apache](http://flask.pocoo.org/docs/deploying/mod_wsgi/) using mod_wsgi.
-
-
-3) Add queries to whatever you have reading the API. In Status Board, add a URL like below to a custom Table widget:
+I recommend running it in some WSGI container. I personally [run flask inside apache](http://flask.pocoo.org/docs/deploying/mod_wsgi/) using mod_wsgi. My wsgi scripts looks something like:
 
 ```
-http://yourhost.se:port/v1/station-id/departures?key=key&distance=5&buses=none&trams=none
+$ cat sl.wsgi
+import sys
+sys.path.insert(0, <path to code>)
+
+from app import configure
+from app import app as application
+configure('config.yaml') # this is loaded from the webserver cwd, use absolute paths if you want
+```
+
+
+4) Add queries to whatever you have reading the API. In Status Board, add a URL like below to a custom Table widget:
+
+```
+http://yourhost.se:port/v1/station-id/departures?distance=5&buses=none&trams=none
 ```
 
 The station ID is a [unique integer ID](http://console.apihq.com/sl-realtidsinformation) for the station you want departures for.
@@ -60,7 +78,6 @@ The API path is simply the station id (see above), the arguments are as follows:
 
 | Name      | Typ                 | Optional? | Description |
 | -------- |:-------------------- |:--------- | ----------- |
-| key      | string               | no        | Trafiklab API key. See trafiklabs site on how to get one. |
 | distance | integer              | yes       | How long it takes to get to the station in minutes. Will filter departures that leave in less time. |
 | limit    | integer              | yes       | Return at most this many results, regardless of how many available departures there are. |
 | alt      | string               | yes       | Return in alternative format. Valid values: json |

@@ -17,18 +17,19 @@ log = logging.getLogger()
 TYPES = set(['Buses', 'Metros', 'Trains', 'Trams'])
 
 # what we're interested in
-METRO_VALUES = (u'TransportMode', u'GroupOfLine', u'StationName', u'LineNumber',
-                u'Destination')
-METRO_DISPLAY = (u'DisplayRow1', u'DisplayRow2')
-TRAIN_DISPLAY = u'DisplayTime'
+VALUES_OF_INTEREST = (u'TransportMode',
+                      u'StationName',
+                      u'LineNumber',
+                      u'Destination',
+                      u'DisplayTime',
+                      u'GroupOfLine')
 
 # combined regex for metro-style and train-style displayrows
 # matches both HH:MM and MM min style times
 DISPLAY_NAME_RE = re.compile('^([0-9]+) +([a-zA-ZåäöÅÄÖ\.]+) *([0-9]+[:0-9]* ?[min]*\.?) *,?')
 
-METRO_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetDepartures.json?&siteId=%s&key=%s'
-TRAIN_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetDpsDepartures.json?&siteId=%s&key=%s&timeWindow=60'
-STATION_URL_TEMPLATE = 'https://api.trafiklab.se/sl/realtid/GetSite.json?&stationSearch=%s&key=%s'
+DEPARTURE_URL_TEMPLATE = 'http://api.sl.se/api2/realtimedepartures.json?key=%s&siteid=%s&timewindow=60'
+STATION_URL_TEMPLATE = 'https://api.sl.se/api2/typeahead.json?key=%s&searchstring=%s&stationsonly=true&maxresults=1'
 
 # i dont care about fjärrtåg
 BANNED_DESTINATIONS = set([u'Fjärrtåg'])
@@ -122,11 +123,16 @@ def convert_time(time):
     an actual integer minute represenation.
     Examples:
 
+    'Nu' => 0
     '8 min.'' => 8
     '12:22' (at the time of 12:18) => 4
     '9' => 9
     """
-    if ':' in time:
+    if 'min' in time:
+        time = time.replace('min', '').replace('.', '').strip()
+    elif 'Nu' in time:
+        time = 0
+    elif ':' in time:
         now = get_now()
         # floor below minute
         now = datetime.datetime(year=now.year, month=now.month, day=now.day,
@@ -144,8 +150,6 @@ def convert_time(time):
 
         time = round((dtime - now).total_seconds() / 60.0)
 
-    elif 'min' in time:
-        time = time.replace('min', '').replace('.', '').strip()
 
     return int(time)
 
@@ -179,49 +183,26 @@ def parse_json_response(text, whitelist=None):
     jdata = json.loads(text)
     data = []
     # iterate over buses, trains, trams etc
-    for transport_type, transport in jdata.get(u'Departure', jdata.get(u'DPS', {})).iteritems():
+    for transport_type, transport in jdata.get(u'ResponseData', {}).iteritems():
         # Metros/Metro sub iteration
         if transport_type in TYPES and transport:
-            items = transport.values()[0]
-            # sometimes lone items are just a dict
-            if type(items) == dict:
-                items = [items]
-
-            for item in items:
+            for item in transport:
                 row = {}
-                for value in METRO_VALUES:
+                for value in VALUES_OF_INTEREST:
                     if value in item:
                         row[value.lower()] = item[value]
 
-                rows = []
-                # split up metro displayrows into individual elements,
-                # since they are encoded in the actual displayrows
-                # that you see when waiting at the station
-                # this includes warnings about pickpockets and other nonsense
-                if METRO_DISPLAY[0] in item:
-                    for value in METRO_DISPLAY:
-                        for display_row in parse_displayrow(item[value]):
-                            row = copy.deepcopy(row)
-                            row.update(display_row)
-                            rows.append(row)
-                # else (trains etc), extract time as normal
-                if TRAIN_DISPLAY in item:
-                    row[u'displaytime'] = item[TRAIN_DISPLAY]
-                    rows.append(row)
+                # if we have a whitelist, skip if not in it
+                if transport_type in whitelist and \
+                   row[u'linenumber'] not in whitelist[transport_type]:
+                    continue
 
-                # filter and convert time to minutes
-                for row in rows:
-                    # if we have a whitelist, skip if not in it
-                    if transport_type in whitelist and \
-                       row[u'linenumber'] not in whitelist[transport_type]:
-                        continue
+                # filter out banned destinations
+                if row[u'destination'] in BANNED_DESTINATIONS:
+                    continue
 
-                    # filter out banned destinations
-                    if row[u'destination'] in BANNED_DESTINATIONS:
-                        continue
-
-                    row[u'time'] = convert_time(row[u'displaytime'])
-                    data.append(row)
+                row[u'time'] = convert_time(row[u'displaytime'])
+                data.append(row)
 
     return data
 
@@ -233,10 +214,9 @@ def parse_json_site_response(text):
     """
     jdata = json.loads(text)
     data = []
-    for site_type, site in jdata.get(u'Hafas', {}).iteritems():
-        if site_type == u'Sites':
-            for item in site.values():
-                data.append({u'name': item['Name']})
+    for site in jdata.get(u'ResponseData', {}):
+        if site.get(u'Type') == 'Station':
+            data.append({u'name': site['Name']})
     return data
 
 
@@ -254,9 +234,9 @@ def query_trafiklab(url):
 def get_departure(url_template, station, key, whitelist=None):
     """
     Helper function to get the parsed response for the given
-    URL, station and API key.
+    URL, station and departure API key.
     """
-    resp = query_trafiklab(url_template % (station, key))
+    resp = query_trafiklab(url_template % (key, station))
     return parse_json_response(resp, whitelist)
 
 
@@ -306,10 +286,9 @@ def get_departures(station, key, whitelist=None):
     Returns a list of all departures for the given station.
     Each element describes a departure, encoded as a dictionary.
     The list is ordered by departure time, ascending order.
-    The API key needs to be a valid trafiklab API key.
+    The API key needs to be a valid trafiklab departure API key.
     """
-    data = get_departure(METRO_URL_TEMPLATE, station, key, whitelist)
-    data.extend(get_departure(TRAIN_URL_TEMPLATE, station, key, whitelist))
+    data = get_departure(DEPARTURE_URL_TEMPLATE, station, key, whitelist)
 
     # see if we have cached older entries which are still relevant
     data.extend(handle_flapping_displays(station, data, cached_data))
@@ -326,8 +305,9 @@ def get_departures(station, key, whitelist=None):
 def get_station_name(station, key):
     """
     Returns the name of the given station ID.
+    The API key needs to be a valid trafiklab platsuppslagnings API key.
     """
-    resp = query_trafiklab(STATION_URL_TEMPLATE % (station, key))
+    resp = query_trafiklab(STATION_URL_TEMPLATE % (key, station))
     data = parse_json_site_response(resp)
     if len(data) < 1:
         raise ApiException('Site name response from trafiklab was empty')
