@@ -28,7 +28,7 @@ VALUES_OF_INTEREST = (u'TransportMode',
 # matches both HH:MM and MM min style times
 DISPLAY_NAME_RE = re.compile('^([0-9]+) +([a-zA-ZåäöÅÄÖ\.]+) *([0-9]+[:0-9]* ?[min]*\.?) *,?')
 
-DEPARTURE_URL_TEMPLATE = 'http://api.sl.se/api2/realtimedepartures.json?key=%s&siteid=%s&timewindow=60'
+DEPARTURE_URL_TEMPLATE = 'http://api.sl.se/api2/realtimedeparturesV4.json?key=%s&siteid=%s&timewindow=60'
 STATION_URL_TEMPLATE = 'https://api.sl.se/api2/typeahead.json?key=%s&searchstring=%s&stationsonly=true&maxresults=1'
 
 # i dont care about fjärrtåg

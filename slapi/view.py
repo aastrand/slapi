@@ -21,17 +21,17 @@ TRANSPORT_COLOR = {u'BLUEBUS': 'blue',
                    u'BUS': 'red',
                    u'TRAM': 'mediumGray',
                    u'TRAIN': 'mediumGray'}
-METRO_COLOR = {u'Tunnelbanans blå linje': 'blue',
-               u'Tunnelbanans gröna linje': 'green',
-               u'Tunnelbanans röda linje': 'red'}
+METRO_COLOR = {u'tunnelbanans blå linje': 'blue',
+               u'tunnelbanans gröna linje': 'green',
+               u'tunnelbanans röda linje': 'red'}
 
 IMAGE_TEMPLATE = '<img src="/static/%s" height="40px" />'
 TRANSPORT_IMAGE = {u'TRAIN': IMAGE_TEMPLATE % 'J.png',
                    u'Spårväg City': IMAGE_TEMPLATE % 'S.png',
                    u'Tvärbanan': IMAGE_TEMPLATE % 'L.png',
-                   u'Tunnelbanans blå linje': IMAGE_TEMPLATE % 'T-bla.png',
-                   u'Tunnelbanans gröna linje': IMAGE_TEMPLATE % 'T-gron.png',
-                   u'Tunnelbanans röda linje': IMAGE_TEMPLATE % 'T-rod.png'}
+                   u'tunnelbanans blå linje': IMAGE_TEMPLATE % 'T-bla.png',
+                   u'tunnelbanans gröna linje': IMAGE_TEMPLATE % 'T-gron.png',
+                   u'tunnelbanans röda linje': IMAGE_TEMPLATE % 'T-rod.png'}
 
 
 def get_transport_color(departure):
