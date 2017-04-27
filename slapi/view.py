@@ -3,7 +3,7 @@
 
 PRE_HEADER = ['<table id="sl_time_table">']
 PRE_HEADER.append('<tr><th style="width:3%"></th>')
-PRE_HEADER.append('<th style="width:75px;text-align:center"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/SL_logo.svg" height="30px" /></th>')
+PRE_HEADER.append('<th style="width:75px;text-align:center"><img src="/static/SL_logo.svg" height="30px" /></th>'')
 HEADER_NAME = '<th style="color:#888888;padding-left:20;font-size:24px">%s </th>'
 POST_HEADER = [('<th style="color:#888888;width:12%;text-align:center;font-size:24px">min.</th>')]
 POST_HEADER.append('</tr>')
@@ -25,7 +25,7 @@ METRO_COLOR = {u'Tunnelbanans blå linje': 'blue',
                u'Tunnelbanans gröna linje': 'green',
                u'Tunnelbanans röda linje': 'red'}
 
-IMAGE_TEMPLATE = '<img src="https://dl.dropboxusercontent.com/u/7823835/SL/%s" height="40px" />'
+IMAGE_TEMPLATE = '<img src="/static/%s" height="40px" />'
 TRANSPORT_IMAGE = {u'TRAIN': IMAGE_TEMPLATE % 'J.png',
                    u'Spårväg City': IMAGE_TEMPLATE % 'S.png',
                    u'Tvärbanan': IMAGE_TEMPLATE % 'L.png',
