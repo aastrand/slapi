@@ -18,31 +18,31 @@ app.app.api_config['departure-key'] = 'test-departure-key'
 
 RENDER_EXPECTED = """<table id="sl_time_table">
 <tr><th style="width:3%"></th>
-<th style="width:75px;text-align:center"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/SL_logo.svg" height="30px" /></th>
+<th style="width:75px;text-align:center"><img src="/static/SL_logo.svg" height="30px" /></th>
 <th style="color:#888888;padding-left:20;font-size:24px">test </th>
 <th style="color:#888888;width:12%;text-align:center;font-size:24px">min.</th>
 </tr>
 <tr>
 <td style="background-color:mediumGray"></td>
-<td class="projectLine" style="color:lightGray"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/J.png" height="40px" /></td>
+<td class="projectLine" style="color:lightGray"><img src="/static/J.png" height="40px" /></td>
 <td class="projectDestination">kongo</td>
 <td class="projectTime" style="text-align:center">2</td>
 </tr>
 <tr>
 <td style="background-color:mediumGray"></td>
-<td class="projectLine" style="color:lightGray"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/J.png" height="40px" /></td>
+<td class="projectLine" style="color:lightGray"><img src="/static/J.png" height="40px" /></td>
 <td class="projectDestination">lars</td>
 <td class="projectTime" style="text-align:center">3</td>
 </tr>
 <tr>
 <td style="background-color:mediumGray"></td>
-<td class="projectLine" style="color:lightGray"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/J.png" height="40px" /></td>
+<td class="projectLine" style="color:lightGray"><img src="/static/J.png" height="40px" /></td>
 <td class="projectDestination">jimmy</td>
 <td class="projectTime" style="text-align:center">5</td>
 </tr>
 <tr>
 <td style="background-color:mediumGray"></td>
-<td class="projectLine" style="color:lightGray"><img src="https://dl.dropboxusercontent.com/u/7823835/SL/J.png" height="40px" /></td>
+<td class="projectLine" style="color:lightGray"><img src="/static/J.png" height="40px" /></td>
 <td class="projectDestination">jeppson</td>
 <td class="projectTime" style="text-align:center">10</td>
 </tr>
