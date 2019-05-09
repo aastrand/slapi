@@ -11,7 +11,7 @@ It tries to be a HTTP REST JSON/HTML API aggregator for the [trafiklab APIs](htt
 
 The HTML renderer can be used as a backend for [Status Board](https://itunes.apple.com/us/app/status-board/id449955536?mt=8&ign-mpt=uo%3D4) custom tables.
 
-![Screenshot](https://dl.dropboxusercontent.com/u/7823835/dashboard2.PNG)
+![Screenshot](screenshot.png)
 
 ## Installation
 
