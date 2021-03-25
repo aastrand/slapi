@@ -1,7 +1,7 @@
 Flask==0.12.3
 Jinja2==2.8.1
 MarkupSafe==0.18
-PyYAML==4.2b1
+PyYAML==5.4
 Werkzeug==0.15.3
 coverage==3.7
 decorator==3.4.0
