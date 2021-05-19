@@ -1,8 +1,12 @@
 # -*- coding: utf-8 -*-
 
 import os
-import yaml
 
+from yaml import load, dump
+try:
+    from yaml import CLoader as Loader, CDumper as Dumper
+except ImportError:
+    from yaml import Loader, Dumper
 
 MANDATORY_KEYS = ['station-key', 'departure-key']
 
@@ -10,7 +14,7 @@ def load_config(f):
     if not os.path.isfile(f):
         raise IOError('Missing configuration file: %s' % f)
 
-    config = yaml.load(open(f))
+    config = load(open(f), Loader=Loader)
 
     if not config:
         raise ValueError('Invalid configuration file (wants yaml): %s' % f)

@@ -73,7 +73,7 @@ def departures(station):
     # unpack arguments
     try:
         distance, limit, whitelist = get_args(request.args)
-    except ValueError, e:
+    except ValueError as e:
         log.exception(str(e))
         resp = make_response(str(e), 400)
         return resp
@@ -82,7 +82,7 @@ def departures(station):
     try:
         data = get_departures(station, app.api_config['departure-key'], whitelist)
         station_name = get_station_name(station, app.api_config['station-key'])
-    except ApiException, e:
+    except ApiException as e:
         log.exception(str(e))
         resp = make_response(str(e), 503)
         return resp
@@ -113,7 +113,7 @@ def station(station):
     # fetch data from model given our station
     try:
         station_name = get_station_name(station, app.api_config['station-key'])
-    except ApiException, e:
+    except ApiException as e:
         log.exception(str(e))
         resp = make_response(str(e), 503)
         return resp

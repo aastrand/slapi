@@ -47,7 +47,7 @@ def reap_cache():
         time.sleep(60)
         now = get_now()
         count = 0
-        for station, (timestamp, data) in cached_data.iteritems():
+        for station, (timestamp, data) in cached_data.items():
             if timestamp - now > datetime.timedelta(minutes=15):
                 count += 1
                 del cached_data[station]
@@ -183,7 +183,7 @@ def parse_json_response(text, whitelist=None):
     jdata = json.loads(text)
     data = []
     # iterate over buses, trains, trams etc
-    for transport_type, transport in jdata.get(u'ResponseData', {}).iteritems():
+    for transport_type, transport in jdata.get(u'ResponseData', {}).items():
         # Metros/Metro sub iteration
         if transport_type in TYPES and transport:
             for item in transport:
