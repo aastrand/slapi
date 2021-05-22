@@ -8,7 +8,5 @@ RUN mkdir slapi/static
 COPY slapi/*.py slapi
 COPY slapi/static/* slapi/static
 
-COPY config.yaml .
-
 ENV PYTHONPATH .
 ENTRYPOINT python3 slapi/app.py

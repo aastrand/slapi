@@ -132,5 +132,5 @@ def configure(config_file):
 
 
 if __name__ == "__main__":
-    configure('config.yaml')
-    app.run()
+    configure('/config.yaml')
+    app.run(host="0.0.0.0")
