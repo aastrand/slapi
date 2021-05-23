@@ -15,13 +15,12 @@ The HTML renderer can be used as a backend for [Status Board](https://itunes.app
 
 ## Installation
 
-1) Install the requirements using pip:
+1) Create and deploy the docker image
 
-Create and deploy the docker image
+Using whatever docker flow suites you, the Dockerfile is in /
 
-2)
+2) Mount a /config.yaml file with the following content:
 
-Mount a /config.yaml file with the following content:
 ```
 departure-key: <key to your trafiklab realtidsinformation 3 api>
 station-key: <key to your trafikab platsuppslagnings api>
