@@ -5,5 +5,5 @@ RUN pip3 install -r /requirements.txt
 
 RUN mkdir app
 RUN mkdir app/static
-COPY slapi/*.py /app
-COPY slapi/static/* /app/static
+COPY slapi/*.py /app/
+COPY slapi/static/* /app/static/
