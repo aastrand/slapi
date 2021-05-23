@@ -1,12 +1,9 @@
-FROM python:3.8.10-alpine3.13
+FROM tiangolo/meinheld-gunicorn-flask:python3.8
 
 COPY requirements.txt /
-RUN pip3 install -r requirements.txt
+RUN pip3 install -r /requirements.txt
 
-RUN mkdir slapi
-RUN mkdir slapi/static
-COPY slapi/*.py slapi
-COPY slapi/static/* slapi/static
-
-ENV PYTHONPATH .
-ENTRYPOINT python3 slapi/app.py
+RUN mkdir app
+RUN mkdir app/static
+COPY slapi/*.py /app
+COPY slapi/static/* /app/static

@@ -17,38 +17,17 @@ The HTML renderer can be used as a backend for [Status Board](https://itunes.app
 
 1) Install the requirements using pip:
 
-```
-$ pip install -r requirements.txt
-```
+Create and deploy the docker image
 
-2) Create a YAML configuration file named config.yaml, looking something like:
+2)
 
+Mount a /config.yaml file with the following content:
 ```
-$ cat config.yaml
 departure-key: <key to your trafiklab realtidsinformation 3 api>
 station-key: <key to your trafikab platsuppslagnings api>
 ```
 
-3) To run the flask server as is:
-
-```
-$ PYTHONPATH=. python slapi/app.py
-```
-
-I recommend running it in some WSGI container. I personally [run flask inside apache](http://flask.pocoo.org/docs/deploying/mod_wsgi/) using mod_wsgi. My wsgi scripts looks something like:
-
-```
-$ cat sl.wsgi
-import sys
-sys.path.insert(0, <path to code>)
-
-from app import configure
-from app import app as application
-configure('config.yaml') # this is loaded from the webserver cwd, use absolute paths if you want
-```
-
-
-4) Add queries to whatever you have reading the API. In Status Board, add a URL like below to a custom Table widget:
+3) Add queries to whatever you have reading the API. In Status Board, add a URL like below to a custom Table widget:
 
 ```
 http://yourhost.se:port/v1/station-id/departures?distance=5&buses=none&trams=none

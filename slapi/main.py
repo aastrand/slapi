@@ -12,8 +12,8 @@ from view import render_html_table
 from util import load_config
 
 app = Flask(__name__)
-app.debug = True
 log = logging.getLogger()
+app.api_config = load_config('/config.yaml')
 
 
 def get_args(args):
@@ -126,11 +126,5 @@ def station(station):
     return resp
 
 
-def configure(config_file):
-    config = load_config(config_file)
-    app.api_config = config
-
-
 if __name__ == "__main__":
-    configure('/config.yaml')
     app.run(host="0.0.0.0")
