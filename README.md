@@ -17,7 +17,7 @@ The HTML renderer can be used as a backend for [Status Board](https://itunes.app
 
 1) Create and deploy the docker image
 
-Using whatever docker flow suites you, the Dockerfile is in /
+Using whatever docker flow suits you, the Dockerfile is in /
 
 2) Mount a /config.yaml file with the following content:
 
