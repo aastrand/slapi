@@ -838,85 +838,86 @@ class ModelTest(unittest.TestCase):
     def test_compile_whitelist(self):
         expected = {'Buses': set(['518', '119']),
                     'Trains': set(['11', '10', '12'])}
-        self.assertEquals(model.compile_whitelist({'trains': '10,11,12',
-                                                   'buses': '119,518'}),
-                          expected)
+        self.assertEqual(model.compile_whitelist({'trains': '10,11,12',
+                                                  'buses': '119,518'}),
+                         expected)
 
         expected = {'Buses': set(['518', '119']),
                     'Trains': set(['11', '10', '12']),
                     'Trams': set(['grisar'])}
-        self.assertEquals(model.compile_whitelist({'trains': '10,11,12',
-                                                   'buses': '119,518',
-                                                   'crap': 'johnny',
-                                                   'trams': 'grisar'}),
-                          expected)
+        self.assertEqual(model.compile_whitelist({'trains': '10,11,12',
+                                                  'buses': '119,518',
+                                                  'crap': 'johnny',
+                                                  'trams': 'grisar'}),
+                         expected)
 
     def test_parse_displayrow(self):
         expected = [{u'destination': u'Hjulsta', u'displaytime': u'11 min', u'linenumber': u'10'},
                     {u'destination': u'Hjulsta', u'displaytime': u'21 min.', u'linenumber': u'10'}]
-        self.assertEquals(model.parse_displayrow(u'10 Hjulsta 11 min, 10 Hjulsta 21 min.'),
-                          expected)
+        self.assertEqual(model.parse_displayrow(u'10 Hjulsta 11 min, 10 Hjulsta 21 min.'),
+                         expected)
         expected = [{u'linenumber': u'10',
                      u'destination': u'Kungsträdg.', u'displaytime': u'14 min.'}]
-        self.assertEquals(model.parse_displayrow(u'10 Kungsträdg. 14 min.'),
-                          expected)
+        self.assertEqual(model.parse_displayrow(u'10 Kungsträdg. 14 min.'),
+                         expected)
 
         expected = [{u'linenumber': u'10',
                      u'destination': u'Kungsträdg.', u'displaytime': u'1 min'}]
-        self.assertEquals(model.parse_displayrow(u'10 Kungsträdg. 1 min'),
-                          expected)
+        self.assertEqual(model.parse_displayrow(u'10 Kungsträdg. 1 min'),
+                         expected)
 
         expected = [{u'linenumber': u'10',
                      u'destination': u'Kungsträdg.', u'displaytime': u'1 min'}]
-        self.assertEquals(model.parse_displayrow(u'10  Kungsträdg. 1 min'),
-                          expected)
+        self.assertEqual(model.parse_displayrow(u'10  Kungsträdg. 1 min'),
+                         expected)
 
         expected = []
-        self.assertEquals(model.parse_displayrow(u'Korta tåg, vänligen gå mot mitten av plattformen. Short trains, please continue to the middle of the platform.'),
-                          expected)
+        self.assertEqual(model.parse_displayrow(u'Korta tåg, vänligen gå mot mitten av plattformen. Short trains, please continue to the middle of the platform.'),
+                         expected)
 
         expected = [{u'linenumber': u'10', u'destination': u'Kungsträdg.', u'displaytime': u'01:49'},
                     {u'linenumber': u'10', u'destination': u'Kungsträdg.', u'displaytime': u'02:19'}]
-        self.assertEquals(model.parse_displayrow(u'10 Kungsträdg. 01:49 10 Kungsträdg. 02:19'),
-                          expected)
+        self.assertEqual(model.parse_displayrow(u'10 Kungsträdg. 01:49 10 Kungsträdg. 02:19'),
+                         expected)
 
         expected = [{u'destination': u'Hjulsta', u'displaytime': u'8 min', u'linenumber': u'10'},
                     {u'destination': u'Hjulsta', u'displaytime': u'16 min.', u'linenumber': u'10'}]
-        self.assertEquals(model.parse_displayrow(u'10 Hjulsta   8 min,      10 Hjulsta  16 min.'),
-                          expected)
+        self.assertEqual(model.parse_displayrow(u'10 Hjulsta   8 min,      10 Hjulsta  16 min.'),
+                         expected)
 
-        self.assertEquals(model.parse_displayrow({}), [])
+        self.assertEqual(model.parse_displayrow({}), [])
 
     @patch('slapi.model.get_now')
     def test_parse_response(self, now_mock):
         now_mock.return_value = datetime.datetime(2013, 12, 1, 00, 30)
-        expected = [{'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Bålsta', 'displaytime': 'Nu', 'time': 0}, {'transportmode': 'METRO', 'linenumber': '10', 'destination': 'Hjulsta', 'displaytime': 'Nu', 'groupofline': 'Tunnelbanans blå linje', 'time': 0}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Västerhaninge', 'displaytime': '2 min', 'time': 2}, {'transportmode': 'BUS', 'linenumber': '504', 'destination': 'Rissne', 'displaytime': '4 min', 'groupofline': None, 'time': 4}, {'transportmode': 'BUS', 'linenumber': '152', 'destination': 'Liljeholmen', 'displaytime': '5 min', 'groupofline': None, 'time': 5}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Danderyds sjukhus', 'displaytime': '6 min', 'groupofline': None, 'time': 6}, {'transportmode': 'BUS', 'linenumber': '152', 'destination': 'Bromma flygplats', 'displaytime': '8 min', 'groupofline': None, 'time': 8}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Karolinska sjukhuset', 'displaytime': '9 min', 'groupofline': None, 'time': 9}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Hallonbergen', 'displaytime': '9 min', 'groupofline': None, 'time': 9}, {'transportmode': 'BUS', 'linenumber': '113', 'destination': 'Solna centrum', 'displaytime': '10 min', 'groupofline': None, 'time': 10}, {'transportmode': 'METRO', 'linenumber': '10', 'destination': 'Hjulsta', 'displaytime': '11 min', 'groupofline': 'Tunnelbanans blå linje', 'time': 11}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Brommaplan', 'displaytime': '12 min', 'groupofline': None, 'time': 12}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Kungsängen', 'displaytime': '14 min', 'time': 14}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Nynäshamn', 'displaytime': '17 min', 'time': 17}, {'transportmode': 'BUS', 'linenumber': '504', 'destination': 'Rissne', 'displaytime': '20 min', 'groupofline': None, 'time': 20}, {'transportmode': 'METRO', 'linenumber': '10', 'destination': 'Hjulsta', 'displaytime': '21 min', 'groupofline': 'Tunnelbanans blå linje', 'time': 21}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Karolinska sjukhuset', 'displaytime': '22 min', 'groupofline': None, 'time': 22}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Hallonbergen', 'displaytime': '24 min', 'groupofline': None, 'time': 24}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Bålsta', 'displaytime': '29 min', 'time': 29}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Brommaplan', 'displaytime': '29 min', 'groupofline': None, 'time': 29}, {'transportmode': 'BUS', 'linenumber': '515', 'destination': 'Odenplan', 'displaytime': '13:15', 'groupofline': None, 'time': 765}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Danderyds sjukhus', 'displaytime': '13:24', 'groupofline': None, 'time': 774}, {
-            'transportmode': 'BUS', 'linenumber': '113', 'destination': 'Blackebergs gård', 'displaytime': '13:27', 'groupofline': None, 'time': 777}, {'transportmode': 'BUS', 'linenumber': '515', 'destination': 'Odenplan', 'displaytime': '13:30', 'groupofline': None, 'time': 780}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Västerhaninge', 'displaytime': '13:39', 'time': 789}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Danderyds sjukhus', 'displaytime': '13:39', 'groupofline': None, 'time': 789}, {'transportmode': 'BUS', 'linenumber': '504', 'destination': 'Rissne', 'displaytime': '13:41', 'groupofline': None, 'time': 791}, {'transportmode': 'BUS', 'linenumber': '152', 'destination': 'Liljeholmen', 'displaytime': '13:42', 'groupofline': None, 'time': 792}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Karolinska sjukhuset', 'displaytime': '13:44', 'groupofline': None, 'time': 794}, {'transportmode': 'BUS', 'linenumber': '152', 'destination': 'Bromma flygplats', 'displaytime': '13:44', 'groupofline': None, 'time': 794}, {'transportmode': 'BUS', 'linenumber': '515', 'destination': 'Odenplan', 'displaytime': '13:45', 'groupofline': None, 'time': 795}, {'transportmode': 'BUS', 'linenumber': '113', 'destination': 'Solna centrum', 'displaytime': '13:46', 'groupofline': None, 'time': 796}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Hallonbergen', 'displaytime': '13:46', 'groupofline': None, 'time': 796}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Brommaplan', 'displaytime': '13:46', 'groupofline': None, 'time': 796}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Kungsängen', 'displaytime': '13:51', 'time': 801}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Nynäshamn', 'displaytime': '13:54', 'time': 804}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Danderyds sjukhus', 'displaytime': '13:54', 'groupofline': None, 'time': 804}, {'transportmode': 'BUS', 'linenumber': '504', 'destination': 'Rissne', 'displaytime': '13:56', 'groupofline': None, 'time': 806}, {'transportmode': 'BUS', 'linenumber': '113', 'destination': 'Blackebergs gård', 'displaytime': '13:57', 'groupofline': None, 'time': 807}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Karolinska sjukhuset', 'displaytime': '13:59', 'groupofline': None, 'time': 809}, {'transportmode': 'BUS', 'linenumber': '515', 'destination': 'Odenplan', 'displaytime': '14:00', 'groupofline': None, 'time': 810}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Hallonbergen', 'displaytime': '14:01', 'groupofline': None, 'time': 811}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Brommaplan', 'displaytime': '14:01', 'groupofline': None, 'time': 811}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Bålsta', 'displaytime': '14:06', 'time': 816}]
+        expected = [{'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Bålsta', 'displaytime': 'Nu', 'time': 0}, {'transportmode': 'METRO', 'linenumber': '10', 'destination': 'Hjulsta', 'displaytime': 'Nu', 'groupofline': 'Tunnelbanans blå linje', 'time': 0}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Västerhaninge', 'displaytime': '2 min', 'time': 2}, {'transportmode': 'BUS', 'linenumber': '504', 'destination': 'Rissne', 'displaytime': '4 min', 'groupofline': None, 'time': 4}, {'transportmode': 'BUS', 'linenumber': '152', 'destination': 'Liljeholmen', 'displaytime': '5 min', 'groupofline': None, 'time': 5}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Danderyds sjukhus', 'displaytime': '6 min', 'groupofline': None, 'time': 6}, {'transportmode': 'BUS', 'linenumber': '152', 'destination': 'Bromma flygplats', 'displaytime': '8 min', 'groupofline': None, 'time': 8}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Karolinska sjukhuset', 'displaytime': '9 min', 'groupofline': None, 'time': 9}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Hallonbergen', 'displaytime': '9 min', 'groupofline': None, 'time': 9}, {'transportmode': 'BUS', 'linenumber': '113', 'destination': 'Solna centrum', 'displaytime': '10 min', 'groupofline': None, 'time': 10}, {
+            'transportmode': 'METRO', 'linenumber': '10', 'destination': 'Hjulsta', 'displaytime': '11 min', 'groupofline': 'Tunnelbanans blå linje', 'time': 11}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Brommaplan', 'displaytime': '12 min', 'groupofline': None, 'time': 12}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Kungsängen', 'displaytime': '14 min', 'time': 14}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Nynäshamn', 'displaytime': '17 min', 'time': 17}, {'transportmode': 'BUS', 'linenumber': '504', 'destination': 'Rissne', 'displaytime': '20 min', 'groupofline': None, 'time': 20}, {'transportmode': 'METRO', 'linenumber': '10', 'destination': 'Hjulsta', 'displaytime': '21 min', 'groupofline': 'Tunnelbanans blå linje', 'time': 21}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Karolinska sjukhuset', 'displaytime': '22 min', 'groupofline': None, 'time': 22}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Hallonbergen', 'displaytime': '24 min', 'groupofline': None, 'time': 24}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Bålsta', 'displaytime': '29 min', 'time': 29}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Brommaplan', 'displaytime': '29 min', 'groupofline': None, 'time': 29}]
         expected.sort(key=lambda x: x['time'])
         out = model.parse_json_response(DEPARTURE_JSON_TESTINPUT)
         out.sort(key=lambda x: x['time'])
-        self.assertEquals(out, expected)
+        print(out)
+        self.assertEqual(out, expected)
 
     @patch('slapi.model.get_now')
     def test_convert_time(self, now_mock):
         now_mock.return_value = datetime.datetime(2013, 12, 1, 13, 2)
-        self.assertEquals(model.convert_time('13:10'), 8)
+        self.assertEqual(model.convert_time('13:10'), 8)
 
         now_mock.return_value = datetime.datetime(2013, 12, 1, 23, 42)
-        self.assertEquals(model.convert_time('00:15'), 33)
+        self.assertEqual(model.convert_time('00:15'), 33)
 
         now_mock.return_value = datetime.datetime(2013, 12, 1, 23, 42, 30)
-        self.assertEquals(model.convert_time('23:42'), 0)
+        self.assertEqual(model.convert_time('23:42'), 0)
 
-        self.assertEquals(model.convert_time('10 min'), 10)
-        self.assertEquals(model.convert_time('1 min.'), 1)
+        self.assertEqual(model.convert_time('10 min'), 10)
+        self.assertEqual(model.convert_time('1 min.'), 1)
 
-        self.assertEquals(model.convert_time('100'), 100)
+        self.assertEqual(model.convert_time('100'), 100)
 
-        self.assertEquals(model.convert_time('Nu'), 0)
+        self.assertEqual(model.convert_time('Nu'), 0)
 
-        self.assertEquals(model.convert_time('-1 min'), -1)
-        self.assertEquals(model.convert_time('-'), 0)
+        self.assertEqual(model.convert_time('-1 min'), -1)
+        self.assertEqual(model.convert_time('-'), 0)
 
     @patch('slapi.model.requests')
     @patch('slapi.model.get_now')
@@ -933,10 +934,10 @@ class ModelTest(unittest.TestCase):
         req_mock.get.return_value.text = DEPARTURE_JSON_TESTINPUT
 
         out = model.get_departure('http://test/%s/%s', 31337, 'deadbeef')
-        self.assertEquals(type(out), list)
-        self.assertEquals(len(out), 44)
+        self.assertEqual(type(out), list)
+        self.assertEqual(len(out), 44)
         for item in out:
-            self.assertEquals(type(item), dict)
+            self.assertEqual(type(item), dict)
             self.assertTrue(len(item) > 0)
 
     @patch('slapi.model.requests')
@@ -961,10 +962,10 @@ class ModelTest(unittest.TestCase):
         req_mock.get = mock_get
 
         out = model.get_departures(31337, 'deadbeef')
-        self.assertEquals(type(out), list)
-        self.assertEquals(len(out), 44)
+        self.assertEqual(type(out), list)
+        self.assertEqual(len(out), 44)
         for item in out:
-            self.assertEquals(type(item), dict)
+            self.assertEqual(type(item), dict)
             self.assertTrue(len(item) > 0)
 
     @patch('slapi.model.get_now')
@@ -1020,8 +1021,8 @@ class ModelTest(unittest.TestCase):
             d[u'time'] -= 2
 
         # first time, no flaps
-        self.assertEquals(model.handle_flapping_displays('4711', data, {}),
-                          [])
+        self.assertEqual(model.handle_flapping_displays('4711', data, {}),
+                         [])
 
         # make the two hjulsta departures flap
         ts = datetime.datetime(2013, 12, 1, 00, 24)
@@ -1035,8 +1036,8 @@ class ModelTest(unittest.TestCase):
         cache = {'4711': (ts, cached)}
 
         # expect them back
-        self.assertEquals(model.handle_flapping_displays('4711', data, cache),
-                          expected)
+        self.assertEqual(model.handle_flapping_displays('4711', data, cache),
+                         expected)
 
         # age the cache 10 mins, now only the 16 min departure is relevant
         ts = datetime.datetime(2013, 12, 1, 00, 24)
@@ -1046,23 +1047,23 @@ class ModelTest(unittest.TestCase):
         expected[0][u'firstseen'] = ts
         expected[0][u'firsttime'] = expected[0][u'time'] + 10
         now_mock.return_value = datetime.datetime(2013, 12, 1, 00, 34)
-        self.assertEquals(model.handle_flapping_displays('4711', data, cache),
-                          expected)
+        self.assertEqual(model.handle_flapping_displays('4711', data, cache),
+                         expected)
 
     def test_parse_site_response(self):
         expected = [{u'name': u'Sundbyberg (Sundbyberg)'}]
-        self.assertEquals(model.parse_json_site_response(SITE_JSON_TEST_INPUT),
-                          expected)
+        self.assertEqual(model.parse_json_site_response(SITE_JSON_TEST_INPUT),
+                         expected)
 
         expected = [{u'name': u'Sundbyberg (Sundbyberg)'},
                     {u'name': u'Sundbybergs centrum (Sundbyberg)'},
                     {u'name': u'Sundbybergs station (Sundbyberg)'}]
-        self.assertEquals(model.parse_json_site_response(SITE_JSON_TEST_INPUT_LONG),
-                          expected)
+        self.assertEqual(model.parse_json_site_response(SITE_JSON_TEST_INPUT_LONG),
+                         expected)
 
         expected = []
-        self.assertEquals(model.parse_json_site_response('{}'),
-                          expected)
+        self.assertEqual(model.parse_json_site_response('{}'),
+                         expected)
 
     @patch('slapi.model.requests')
     def test_get_station_name(self, req_mock):
@@ -1096,5 +1097,5 @@ class ModelTest(unittest.TestCase):
 
         req_mock.get = mock_get
 
-        self.assertEquals(model.get_station_name(31337, 'deadbeef'),
-                          u'Sundbyberg (Sundbyberg)')
+        self.assertEqual(model.get_station_name(31337, 'deadbeef'),
+                         u'Sundbyberg (Sundbyberg)')

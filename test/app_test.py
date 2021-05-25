@@ -63,8 +63,8 @@ class ModelTest(unittest.TestCase):
 
         with app.app.test_request_context('/v1/station/9325/departures?'):
             r = app.departures(9325)
-            self.assertEquals(r.status_code, 200)
-            self.assertEquals(str(r.response[0], 'UTF-8'), RENDER_EXPECTED)
+            self.assertEqual(r.status_code, 200)
+            self.assertEqual(str(r.response[0], 'UTF-8'), RENDER_EXPECTED)
 
     @patch('slapi.main.get_station_name', lambda *x: 'test')
     @patch('slapi.main.get_departures')
@@ -84,9 +84,9 @@ class ModelTest(unittest.TestCase):
                                                                      1, 00,
                                                                      00, 00)
             r = app.departures(9325)
-            self.assertEquals(r.status_code, 200)
+            self.assertEqual(r.status_code, 200)
             resp = json.loads(r.response[0])
-            self.assertEquals(resp, [{'time': 2, 'transportmode': 'TRAIN',
+            self.assertEqual(resp, [{'time': 2, 'transportmode': 'TRAIN',
                                       'destination': 'kongo'},
                                      {'time': 3, 'transportmode': 'TRAIN',
                                       'destination': 'lars'},
@@ -112,15 +112,15 @@ class ModelTest(unittest.TestCase):
         # limit
         with app.app.test_request_context('/v1/station/9325/departures?alt=json&limit=crap'):
             r = app.departures(9325)
-            self.assertEquals(r.status_code, 400)
-            self.assertEquals(str(r.response[0], 'UTF-8'),
+            self.assertEqual(r.status_code, 400)
+            self.assertEqual(str(r.response[0], 'UTF-8'),
                               'Error while parsing argument limit')
 
         with app.app.test_request_context('/v1/station/9325/departures?alt=json&limit=3'):
             r = app.departures(9325)
-            self.assertEquals(r.status_code, 200)
+            self.assertEqual(r.status_code, 200)
             resp = json.loads(r.response[0])
-            self.assertEquals(resp, [{'time': 2, 'transportmode': 'TRAIN',
+            self.assertEqual(resp, [{'time': 2, 'transportmode': 'TRAIN',
                                       'destination': 'kongo'},
                                      {'time': 3, 'transportmode': 'TRAIN',
                                       'destination': 'lars'},
@@ -141,9 +141,9 @@ class ModelTest(unittest.TestCase):
         # distance
         with app.app.test_request_context('/v1/station/9325/departures?alt=json&distance=3'):
             r = app.departures(9325)
-            self.assertEquals(r.status_code, 200)
+            self.assertEqual(r.status_code, 200)
             resp = json.loads(r.response[0])
-            self.assertEquals(resp, [{'time': 5, 'transportmode': 'TRAIN',
+            self.assertEqual(resp, [{'time': 5, 'transportmode': 'TRAIN',
                                       'destination': 'jimmy'},
                                      {'time': 10, 'transportmode': 'TRAIN',
                                       'destination': 'jeppson'}])
@@ -162,9 +162,9 @@ class ModelTest(unittest.TestCase):
         # combine
         with app.app.test_request_context('/v1/station/9325/departures?alt=json&distance=2&limit=2'):
             r = app.departures(9325)
-            self.assertEquals(r.status_code, 200)
+            self.assertEqual(r.status_code, 200)
             resp = json.loads(r.response[0])
-            self.assertEquals(resp, [{'time': 3, 'transportmode': 'TRAIN',
+            self.assertEqual(resp, [{'time': 3, 'transportmode': 'TRAIN',
                                       'destination': 'lars'},
                                      {'time': 5, 'transportmode': 'TRAIN',
                                       'destination': 'jimmy'}])
@@ -177,17 +177,17 @@ class ModelTest(unittest.TestCase):
         # remove buses and trams
         with app.app.test_request_context('/v1/station/9325/departures?alt=json&buses=none&trams=none'):
             r = app.departures(9325)
-            self.assertEquals(r.status_code, 200)
+            self.assertEqual(r.status_code, 200)
             expected = {'Trams': set([u'none']), 'Buses': set([u'none'])}
-            self.assertEquals(get_dep_mock.call_args_list[0][0][2], expected)
+            self.assertEqual(get_dep_mock.call_args_list[0][0][2], expected)
             get_dep_mock.reset_mock()
 
         # filter metros
         with app.app.test_request_context('/v1/station/9325/departures?alt=json&metros=10,19'):
             r = app.departures(9325)
-            self.assertEquals(r.status_code, 200)
+            self.assertEqual(r.status_code, 200)
             expected = {'Metros': set(['10', '19'])}
-            self.assertEquals(get_dep_mock.call_args_list[0][0][2], expected)
+            self.assertEqual(get_dep_mock.call_args_list[0][0][2], expected)
             get_dep_mock.reset_mock()
 
     @patch('slapi.main.get_station_name')
@@ -195,6 +195,6 @@ class ModelTest(unittest.TestCase):
         get_station_mock.return_value = 'test'
         with app.app.test_request_context('/v1/station/9325'):
             r = app.station(9325)
-            self.assertEquals(r.status_code, 200)
+            self.assertEqual(r.status_code, 200)
             resp = json.loads(r.response[0])
-            self.assertEquals(resp, {u'siteid': '9325', u'name': 'test'})
+            self.assertEqual(resp, {u'siteid': '9325', u'name': 'test'})

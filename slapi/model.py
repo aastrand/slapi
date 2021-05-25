@@ -203,7 +203,9 @@ def parse_json_response(text, whitelist=None):
                     continue
 
                 row[u'time'] = convert_time(row[u'displaytime'])
-                data.append(row)
+                # there's no point in displaying these is there?
+                if row[u'time'] < 100:
+                    data.append(row)
 
     return data
 

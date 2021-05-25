@@ -21,7 +21,7 @@ class UtilTest(unittest.TestCase):
             t.write(CONFIG_EXAMPLE)
             t.flush()
             c = util.load_config(t.name)
-            self.assertEquals(c, expected)
+            self.assertEqual(c, expected)
 
         with tempfile.NamedTemporaryFile(mode='wt') as t:
             t.write('crap')

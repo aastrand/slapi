@@ -14,32 +14,32 @@ class ViewTest(unittest.TestCase):
                      u'stationname': u'Sundbybergs centrum',
                      u'time': 5,
                      u'transportmode': u'METRO'}
-        self.assertEquals(view.get_transport_color(departure), 'blue')
+        self.assertEqual(view.get_transport_color(departure), 'blue')
 
         departure[u'groupofline'] = u'tunnelbanans gröna linje'
-        self.assertEquals(view.get_transport_color(departure), 'green')
+        self.assertEqual(view.get_transport_color(departure), 'green')
 
         departure[u'groupofline'] = u'tunnelbanans röda linje'
-        self.assertEquals(view.get_transport_color(departure), 'red')
+        self.assertEqual(view.get_transport_color(departure), 'red')
 
         departure[u'groupofline'] = u'tunnelbanans gula linje'
-        self.assertEquals(view.get_transport_color(departure), 'mediumGray')
+        self.assertEqual(view.get_transport_color(departure), 'mediumGray')
 
         del departure[u'groupofline']
         departure[u'transportmode'] = 'BLUEBUS'
-        self.assertEquals(view.get_transport_color(departure), 'blue')
+        self.assertEqual(view.get_transport_color(departure), 'blue')
 
         departure[u'transportmode'] = 'BUS'
-        self.assertEquals(view.get_transport_color(departure), 'red')
+        self.assertEqual(view.get_transport_color(departure), 'red')
 
         departure[u'transportmode'] = 'TRAM'
-        self.assertEquals(view.get_transport_color(departure), 'mediumGray')
+        self.assertEqual(view.get_transport_color(departure), 'mediumGray')
 
         departure[u'transportmode'] = 'TRAIN'
-        self.assertEquals(view.get_transport_color(departure), 'mediumGray')
+        self.assertEqual(view.get_transport_color(departure), 'mediumGray')
 
         departure[u'transportmode'] = 'DONKEY'
-        self.assertEquals(view.get_transport_color(departure), 'mediumGray')
+        self.assertEqual(view.get_transport_color(departure), 'mediumGray')
 
     def test_get_description(self):
         departure = {u'destination': u'Kungsträdg.',
@@ -51,20 +51,20 @@ class ViewTest(unittest.TestCase):
                      u'transportmode': u'METRO'}
 
         expected = '<img src="/static/T-bla.png" height="40px" />'
-        self.assertEquals(view.get_description(departure), expected)
+        self.assertEqual(view.get_description(departure), expected)
 
         departure[u'groupofline'] = u'tunnelbanans gröna linje'
         expected = '<img src="/static/T-gron.png" height="40px" />'
-        self.assertEquals(view.get_description(departure), expected)
+        self.assertEqual(view.get_description(departure), expected)
 
         departure[u'groupofline'] = u'tunnelbanans röda linje'
         expected = '<img src="/static/T-rod.png" height="40px" />'
-        self.assertEquals(view.get_description(departure), expected)
+        self.assertEqual(view.get_description(departure), expected)
 
         del departure[u'groupofline']
         departure[u'transportmode'] = 'BLUEBUS'
         expected = '10'
-        self.assertEquals(view.get_description(departure), expected)
+        self.assertEqual(view.get_description(departure), expected)
 
     def test_render(self):
         data = [{u'destination': u'Kungsträdg.',
@@ -100,5 +100,5 @@ class ViewTest(unittest.TestCase):
 <td class="projectTime" style="text-align:center">5</td>
 </tr>
 </table>"""
-        self.assertEquals(view.render_html_table('Sundbyberg', data),
+        self.assertEqual(view.render_html_table('Sundbyberg', data),
                           expected)
