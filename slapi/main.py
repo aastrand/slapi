@@ -13,7 +13,11 @@ from util import load_config
 
 app = Flask(__name__)
 log = logging.getLogger()
-app.api_config = load_config('/config.yaml')
+
+
+@app.before_first_request
+def _run_on_start():
+    app.api_config = load_config('/config.yaml')
 
 
 def get_args(args):
@@ -124,7 +128,3 @@ def station(station):
     resp.headers['Content-Type'] = 'application/json; charset=utf-8'
 
     return resp
-
-
-if __name__ == "__main__":
-    app.run(host="0.0.0.0")

@@ -889,262 +889,9 @@ class ModelTest(unittest.TestCase):
 
     @patch('slapi.model.get_now')
     def test_parse_response(self, now_mock):
-        now_mock.return_value = datetime.datetime(2013, 12, 01, 00, 30)
-        expected = [ {u'destination': u'Bålsta',
-                      u'displaytime': u'Nu',
-                      u'linenumber': u'35',
-                      u'time': 0,
-                      u'transportmode': u'TRAIN'},
-                     {u'destination': u'Hjulsta',
-                      u'displaytime': u'Nu',
-                      u'groupofline': u'Tunnelbanans blå linje',
-                      u'linenumber': u'10',
-                      u'time': 0,
-                      u'transportmode': u'METRO'},
-                     {u'destination': u'Västerhaninge',
-                      u'displaytime': u'2 min',
-                      u'linenumber': u'35',
-                      u'time': 2,
-                      u'transportmode': u'TRAIN'},
-                     {u'destination': u'Rissne',
-                      u'displaytime': u'4 min',
-                      u'groupofline': None,
-                      u'linenumber': u'504',
-                      u'time': 4,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Liljeholmen',
-                      u'displaytime': u'5 min',
-                      u'groupofline': None,
-                      u'linenumber': u'152',
-                      u'time': 5,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Danderyds sjukhus',
-                      u'displaytime': u'6 min',
-                      u'groupofline': None,
-                      u'linenumber': u'509',
-                      u'time': 6,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Bromma flygplats',
-                      u'displaytime': u'8 min',
-                      u'groupofline': None,
-                      u'linenumber': u'152',
-                      u'time': 8,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Karolinska sjukhuset',
-                      u'displaytime': u'9 min',
-                      u'groupofline': None,
-                      u'linenumber': u'506',
-                      u'time': 9,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Hallonbergen',
-                      u'displaytime': u'9 min',
-                      u'groupofline': None,
-                      u'linenumber': u'506',
-                      u'time': 9,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Solna centrum',
-                      u'displaytime': u'10 min',
-                      u'groupofline': None,
-                      u'linenumber': u'113',
-                      u'time': 10,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Hjulsta',
-                      u'displaytime': u'11 min',
-                      u'groupofline': u'Tunnelbanans blå linje',
-                      u'linenumber': u'10',
-                      u'time': 11,
-                      u'transportmode': u'METRO'},
-                     {u'destination': u'Brommaplan',
-                      u'displaytime': u'12 min',
-                      u'groupofline': None,
-                      u'linenumber': u'509',
-                      u'time': 12,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Kungsängen',
-                      u'displaytime': u'14 min',
-                      u'linenumber': u'35',
-                      u'time': 14,
-                      u'transportmode': u'TRAIN'},
-                     {u'destination': u'Nynäshamn',
-                      u'displaytime': u'17 min',
-                      u'linenumber': u'35',
-                      u'time': 17,
-                      u'transportmode': u'TRAIN'},
-                     {u'destination': u'Rissne',
-                      u'displaytime': u'20 min',
-                      u'groupofline': None,
-                      u'linenumber': u'504',
-                      u'time': 20,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Hjulsta',
-                      u'displaytime': u'21 min',
-                      u'groupofline': u'Tunnelbanans blå linje',
-                      u'linenumber': u'10',
-                      u'time': 21,
-                      u'transportmode': u'METRO'},
-                     {u'destination': u'Karolinska sjukhuset',
-                      u'displaytime': u'22 min',
-                      u'groupofline': None,
-                      u'linenumber': u'506',
-                      u'time': 22,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Hallonbergen',
-                      u'displaytime': u'24 min',
-                      u'groupofline': None,
-                      u'linenumber': u'506',
-                      u'time': 24,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Brommaplan',
-                      u'displaytime': u'29 min',
-                      u'groupofline': None,
-                      u'linenumber': u'509',
-                      u'time': 29,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Bålsta',
-                      u'displaytime': u'29 min',
-                      u'linenumber': u'35',
-                      u'time': 29,
-                      u'transportmode': u'TRAIN'},
-                     {u'destination': u'Odenplan',
-                      u'displaytime': u'13:15',
-                      u'groupofline': None,
-                      u'linenumber': u'515',
-                      u'time': 765,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Danderyds sjukhus',
-                      u'displaytime': u'13:24',
-                      u'groupofline': None,
-                      u'linenumber': u'509',
-                      u'time': 774,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Blackebergs gård',
-                      u'displaytime': u'13:27',
-                      u'groupofline': None,
-                      u'linenumber': u'113',
-                      u'time': 777,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Odenplan',
-                      u'displaytime': u'13:30',
-                      u'groupofline': None,
-                      u'linenumber': u'515',
-                      u'time': 780,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Danderyds sjukhus',
-                      u'displaytime': u'13:39',
-                      u'groupofline': None,
-                      u'linenumber': u'509',
-                      u'time': 789,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Västerhaninge',
-                      u'displaytime': u'13:39',
-                      u'linenumber': u'35',
-                      u'time': 789,
-                      u'transportmode': u'TRAIN'},
-                     {u'destination': u'Rissne',
-                      u'displaytime': u'13:41',
-                      u'groupofline': None,
-                      u'linenumber': u'504',
-                      u'time': 791,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Liljeholmen',
-                      u'displaytime': u'13:42',
-                      u'groupofline': None,
-                      u'linenumber': u'152',
-                      u'time': 792,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Karolinska sjukhuset',
-                      u'displaytime': u'13:44',
-                      u'groupofline': None,
-                      u'linenumber': u'506',
-                      u'time': 794,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Bromma flygplats',
-                      u'displaytime': u'13:44',
-                      u'groupofline': None,
-                      u'linenumber': u'152',
-                      u'time': 794,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Odenplan',
-                      u'displaytime': u'13:45',
-                      u'groupofline': None,
-                      u'linenumber': u'515',
-                      u'time': 795,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Solna centrum',
-                      u'displaytime': u'13:46',
-                      u'groupofline': None,
-                      u'linenumber': u'113',
-                      u'time': 796,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Hallonbergen',
-                      u'displaytime': u'13:46',
-                      u'groupofline': None,
-                      u'linenumber': u'506',
-                      u'time': 796,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Brommaplan',
-                      u'displaytime': u'13:46',
-                      u'groupofline': None,
-                      u'linenumber': u'509',
-                      u'time': 796,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Kungsängen',
-                      u'displaytime': u'13:51',
-                      u'linenumber': u'35',
-                      u'time': 801,
-                      u'transportmode': u'TRAIN'},
-                     {u'destination': u'Danderyds sjukhus',
-                      u'displaytime': u'13:54',
-                      u'groupofline': None,
-                      u'linenumber': u'509',
-                      u'time': 804,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Nynäshamn',
-                      u'displaytime': u'13:54',
-                      u'linenumber': u'35',
-                      u'time': 804,
-                      u'transportmode': u'TRAIN'},
-                     {u'destination': u'Rissne',
-                      u'displaytime': u'13:56',
-                      u'groupofline': None,
-                      u'linenumber': u'504',
-                      u'time': 806,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Blackebergs gård',
-                      u'displaytime': u'13:57',
-                      u'groupofline': None,
-                      u'linenumber': u'113',
-                      u'time': 807,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Karolinska sjukhuset',
-                      u'displaytime': u'13:59',
-                      u'groupofline': None,
-                      u'linenumber': u'506',
-                      u'time': 809,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Odenplan',
-                      u'displaytime': u'14:00',
-                      u'groupofline': None,
-                      u'linenumber': u'515',
-                      u'time': 810,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Hallonbergen',
-                      u'displaytime': u'14:01',
-                      u'groupofline': None,
-                      u'linenumber': u'506',
-                      u'time': 811,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Brommaplan',
-                      u'displaytime': u'14:01',
-                      u'groupofline': None,
-                      u'linenumber': u'509',
-                      u'time': 811,
-                      u'transportmode': u'BUS'},
-                     {u'destination': u'Bålsta',
-                      u'displaytime': u'14:06',
-                      u'linenumber': u'35',
-                      u'time': 816,
-                      u'transportmode': u'TRAIN'}]
+        now_mock.return_value = datetime.datetime(2013, 12, 1, 00, 30)
+        expected = [{'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Bålsta', 'displaytime': 'Nu', 'time': 0}, {'transportmode': 'METRO', 'linenumber': '10', 'destination': 'Hjulsta', 'displaytime': 'Nu', 'groupofline': 'Tunnelbanans blå linje', 'time': 0}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Västerhaninge', 'displaytime': '2 min', 'time': 2}, {'transportmode': 'BUS', 'linenumber': '504', 'destination': 'Rissne', 'displaytime': '4 min', 'groupofline': None, 'time': 4}, {'transportmode': 'BUS', 'linenumber': '152', 'destination': 'Liljeholmen', 'displaytime': '5 min', 'groupofline': None, 'time': 5}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Danderyds sjukhus', 'displaytime': '6 min', 'groupofline': None, 'time': 6}, {'transportmode': 'BUS', 'linenumber': '152', 'destination': 'Bromma flygplats', 'displaytime': '8 min', 'groupofline': None, 'time': 8}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Karolinska sjukhuset', 'displaytime': '9 min', 'groupofline': None, 'time': 9}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Hallonbergen', 'displaytime': '9 min', 'groupofline': None, 'time': 9}, {'transportmode': 'BUS', 'linenumber': '113', 'destination': 'Solna centrum', 'displaytime': '10 min', 'groupofline': None, 'time': 10}, {'transportmode': 'METRO', 'linenumber': '10', 'destination': 'Hjulsta', 'displaytime': '11 min', 'groupofline': 'Tunnelbanans blå linje', 'time': 11}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Brommaplan', 'displaytime': '12 min', 'groupofline': None, 'time': 12}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Kungsängen', 'displaytime': '14 min', 'time': 14}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Nynäshamn', 'displaytime': '17 min', 'time': 17}, {'transportmode': 'BUS', 'linenumber': '504', 'destination': 'Rissne', 'displaytime': '20 min', 'groupofline': None, 'time': 20}, {'transportmode': 'METRO', 'linenumber': '10', 'destination': 'Hjulsta', 'displaytime': '21 min', 'groupofline': 'Tunnelbanans blå linje', 'time': 21}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Karolinska sjukhuset', 'displaytime': '22 min', 'groupofline': None, 'time': 22}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Hallonbergen', 'displaytime': '24 min', 'groupofline': None, 'time': 24}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Bålsta', 'displaytime': '29 min', 'time': 29}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Brommaplan', 'displaytime': '29 min', 'groupofline': None, 'time': 29}, {'transportmode': 'BUS', 'linenumber': '515', 'destination': 'Odenplan', 'displaytime': '13:15', 'groupofline': None, 'time': 765}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Danderyds sjukhus', 'displaytime': '13:24', 'groupofline': None, 'time': 774}, {
+            'transportmode': 'BUS', 'linenumber': '113', 'destination': 'Blackebergs gård', 'displaytime': '13:27', 'groupofline': None, 'time': 777}, {'transportmode': 'BUS', 'linenumber': '515', 'destination': 'Odenplan', 'displaytime': '13:30', 'groupofline': None, 'time': 780}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Västerhaninge', 'displaytime': '13:39', 'time': 789}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Danderyds sjukhus', 'displaytime': '13:39', 'groupofline': None, 'time': 789}, {'transportmode': 'BUS', 'linenumber': '504', 'destination': 'Rissne', 'displaytime': '13:41', 'groupofline': None, 'time': 791}, {'transportmode': 'BUS', 'linenumber': '152', 'destination': 'Liljeholmen', 'displaytime': '13:42', 'groupofline': None, 'time': 792}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Karolinska sjukhuset', 'displaytime': '13:44', 'groupofline': None, 'time': 794}, {'transportmode': 'BUS', 'linenumber': '152', 'destination': 'Bromma flygplats', 'displaytime': '13:44', 'groupofline': None, 'time': 794}, {'transportmode': 'BUS', 'linenumber': '515', 'destination': 'Odenplan', 'displaytime': '13:45', 'groupofline': None, 'time': 795}, {'transportmode': 'BUS', 'linenumber': '113', 'destination': 'Solna centrum', 'displaytime': '13:46', 'groupofline': None, 'time': 796}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Hallonbergen', 'displaytime': '13:46', 'groupofline': None, 'time': 796}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Brommaplan', 'displaytime': '13:46', 'groupofline': None, 'time': 796}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Kungsängen', 'displaytime': '13:51', 'time': 801}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Nynäshamn', 'displaytime': '13:54', 'time': 804}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Danderyds sjukhus', 'displaytime': '13:54', 'groupofline': None, 'time': 804}, {'transportmode': 'BUS', 'linenumber': '504', 'destination': 'Rissne', 'displaytime': '13:56', 'groupofline': None, 'time': 806}, {'transportmode': 'BUS', 'linenumber': '113', 'destination': 'Blackebergs gård', 'displaytime': '13:57', 'groupofline': None, 'time': 807}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Karolinska sjukhuset', 'displaytime': '13:59', 'groupofline': None, 'time': 809}, {'transportmode': 'BUS', 'linenumber': '515', 'destination': 'Odenplan', 'displaytime': '14:00', 'groupofline': None, 'time': 810}, {'transportmode': 'BUS', 'linenumber': '506', 'destination': 'Hallonbergen', 'displaytime': '14:01', 'groupofline': None, 'time': 811}, {'transportmode': 'BUS', 'linenumber': '509', 'destination': 'Brommaplan', 'displaytime': '14:01', 'groupofline': None, 'time': 811}, {'transportmode': 'TRAIN', 'linenumber': '35', 'destination': 'Bålsta', 'displaytime': '14:06', 'time': 816}]
         expected.sort(key=lambda x: x['time'])
         out = model.parse_json_response(DEPARTURE_JSON_TESTINPUT)
         out.sort(key=lambda x: x['time'])
@@ -1152,13 +899,13 @@ class ModelTest(unittest.TestCase):
 
     @patch('slapi.model.get_now')
     def test_convert_time(self, now_mock):
-        now_mock.return_value = datetime.datetime(2013, 12, 01, 13, 02)
+        now_mock.return_value = datetime.datetime(2013, 12, 1, 13, 2)
         self.assertEquals(model.convert_time('13:10'), 8)
 
-        now_mock.return_value = datetime.datetime(2013, 12, 01, 23, 42)
+        now_mock.return_value = datetime.datetime(2013, 12, 1, 23, 42)
         self.assertEquals(model.convert_time('00:15'), 33)
 
-        now_mock.return_value = datetime.datetime(2013, 12, 01, 23, 42, 30)
+        now_mock.return_value = datetime.datetime(2013, 12, 1, 23, 42, 30)
         self.assertEquals(model.convert_time('23:42'), 0)
 
         self.assertEquals(model.convert_time('10 min'), 10)
@@ -1168,10 +915,13 @@ class ModelTest(unittest.TestCase):
 
         self.assertEquals(model.convert_time('Nu'), 0)
 
+        self.assertEquals(model.convert_time('-1 min'), -1)
+        self.assertEquals(model.convert_time('-'), 0)
+
     @patch('slapi.model.requests')
     @patch('slapi.model.get_now')
     def test_get_departure(self, now_mock, req_mock):
-        now_mock.return_value = datetime.datetime(2013, 12, 01, 13, 02)
+        now_mock.return_value = datetime.datetime(2013, 12, 1, 13, 2)
         req_mock.get = Mock()
         req_mock.get.return_value = Mock()
         req_mock.get.return_value.status_code = 500
@@ -1192,7 +942,7 @@ class ModelTest(unittest.TestCase):
     @patch('slapi.model.requests')
     @patch('slapi.model.get_now')
     def test_get_departures(self, now_mock, req_mock):
-        now_mock.return_value = datetime.datetime(2013, 12, 01, 13, 02)
+        now_mock.return_value = datetime.datetime(2013, 12, 1, 13, 2)
         req_mock.get = Mock()
         req_mock.get.return_value = Mock()
         req_mock.get.return_value.status_code = 500
@@ -1219,7 +969,7 @@ class ModelTest(unittest.TestCase):
 
     @patch('slapi.model.get_now')
     def test_handle_flapping_displays(self, now_mock):
-        now_mock.return_value = datetime.datetime(2013, 12, 01, 00, 26)
+        now_mock.return_value = datetime.datetime(2013, 12, 1, 00, 26)
 
         cached = [{ u'destination': u'Kungsträdg.',
                       u'displaytime': u'5 min',
@@ -1274,7 +1024,7 @@ class ModelTest(unittest.TestCase):
                           [])
 
         # make the two hjulsta departures flap
-        ts = datetime.datetime(2013, 12, 01, 00, 24)
+        ts = datetime.datetime(2013, 12, 1, 00, 24)
         expected = []
         expected.append(data.pop(4))
         expected.append(data.pop(4))
@@ -1289,13 +1039,13 @@ class ModelTest(unittest.TestCase):
                           expected)
 
         # age the cache 10 mins, now only the 16 min departure is relevant
-        ts = datetime.datetime(2013, 12, 01, 00, 24)
+        ts = datetime.datetime(2013, 12, 1, 00, 24)
         cache = {'4711': (ts, cached)}
         expected.pop(0)
         expected[0][u'time'] -= 8
         expected[0][u'firstseen'] = ts
         expected[0][u'firsttime'] = expected[0][u'time'] + 10
-        now_mock.return_value = datetime.datetime(2013, 12, 01, 00, 34)
+        now_mock.return_value = datetime.datetime(2013, 12, 1, 00, 34)
         self.assertEquals(model.handle_flapping_displays('4711', data, cache),
                           expected)
 
