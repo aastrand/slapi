@@ -127,10 +127,12 @@ def convert_time(time):
     '9' => 9
     '-' => 0
     """
+    r = time
+
     if 'min' in time:
-        time = time.replace('min', '').replace('.', '').strip()
+        r = time.replace('min', '').replace('.', '').strip()
     elif 'Nu' in time:
-        time = 0
+        r = 0
     elif ':' in time:
         now = get_now()
         # floor below minute
@@ -147,12 +149,13 @@ def convert_time(time):
         if dtime < now:
             dtime = dtime + datetime.timedelta(days=1)
 
-        time = round((dtime - now).total_seconds() / 60.0)
+        r = round((dtime - now).total_seconds() / 60.0)
 
-    if time == '-':
-        time = 0
-
-    return int(time)
+    try:
+        return int(r)
+    except ValueError:
+        print("Error converting time: " + time)
+        return 0
 
 
 def parse_json_response(text, whitelist=None):
