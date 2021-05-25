@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 
+import pprint
 import copy
 import datetime
 import unittest
@@ -823,17 +824,13 @@ SITE_JSON_TEST_INPUT_LONG = u"""
 """
 
 
-import pprint
-
-
 class MyPrettyPrinter(pprint.PrettyPrinter):
     """
     Pretty printer subclass used for debugging parsing input.
     Avoids some unicode shanigans.
     """
+
     def format(self, object, context, maxlevels, level):
-        if isinstance(object, unicode):
-            return ("u'%s'" % object.encode('utf8'), True, False)
         return pprint.PrettyPrinter.format(self, object, context, maxlevels, level)
 
 
@@ -859,15 +856,18 @@ class ModelTest(unittest.TestCase):
                     {u'destination': u'Hjulsta', u'displaytime': u'21 min.', u'linenumber': u'10'}]
         self.assertEquals(model.parse_displayrow(u'10 Hjulsta 11 min, 10 Hjulsta 21 min.'),
                           expected)
-        expected = [{u'linenumber': u'10', u'destination': u'Kungsträdg.', u'displaytime': u'14 min.'}]
+        expected = [{u'linenumber': u'10',
+                     u'destination': u'Kungsträdg.', u'displaytime': u'14 min.'}]
         self.assertEquals(model.parse_displayrow(u'10 Kungsträdg. 14 min.'),
                           expected)
 
-        expected = [{u'linenumber': u'10', u'destination': u'Kungsträdg.', u'displaytime': u'1 min'}]
+        expected = [{u'linenumber': u'10',
+                     u'destination': u'Kungsträdg.', u'displaytime': u'1 min'}]
         self.assertEquals(model.parse_displayrow(u'10 Kungsträdg. 1 min'),
                           expected)
 
-        expected = [{u'linenumber': u'10', u'destination': u'Kungsträdg.', u'displaytime': u'1 min'}]
+        expected = [{u'linenumber': u'10',
+                     u'destination': u'Kungsträdg.', u'displaytime': u'1 min'}]
         self.assertEquals(model.parse_displayrow(u'10  Kungsträdg. 1 min'),
                           expected)
 
@@ -971,42 +971,42 @@ class ModelTest(unittest.TestCase):
     def test_handle_flapping_displays(self, now_mock):
         now_mock.return_value = datetime.datetime(2013, 12, 1, 00, 26)
 
-        cached = [{ u'destination': u'Kungsträdg.',
-                      u'displaytime': u'5 min',
-                      u'groupofline': u'Tunnelbanans blå linje',
-                      u'linenumber': u'10',
-                      u'stationname': u'Sundbybergs centrum',
-                      u'time': 2,
-                      u'transportmode': u'METRO'},
-                     {u'destination': u'Kungsträdg.',
+        cached = [{u'destination': u'Kungsträdg.',
+                   u'displaytime': u'5 min',
+                   u'groupofline': u'Tunnelbanans blå linje',
+                   u'linenumber': u'10',
+                   u'stationname': u'Sundbybergs centrum',
+                   u'time': 2,
+                   u'transportmode': u'METRO'},
+                  {u'destination': u'Kungsträdg.',
                       u'displaytime': u'5 min',
                       u'groupofline': u'Tunnelbanans blå linje',
                       u'linenumber': u'10',
                       u'stationname': u'Sundbybergs centrum',
                       u'time': 5,
                       u'transportmode': u'METRO'},
-                     {u'destination': u'Kungsträdg.',
+                  {u'destination': u'Kungsträdg.',
                       u'displaytime': u'12 min.',
                       u'groupofline': u'Tunnelbanans blå linje',
                       u'linenumber': u'10',
                       u'stationname': u'Sundbybergs centrum',
                       u'time': 12,
                       u'transportmode': u'METRO'},
-                     {u'destination': u'Hjulsta',
+                  {u'destination': u'Hjulsta',
                       u'displaytime': u'1 min',
                       u'groupofline': u'Tunnelbanans blå linje',
                       u'linenumber': u'10',
                       u'stationname': u'Sundbybergs centrum',
                       u'time': 4,
                       u'transportmode': u'METRO'},
-                     {u'destination': u'Hjulsta',
+                  {u'destination': u'Hjulsta',
                       u'displaytime': u'8 min',
                       u'groupofline': u'Tunnelbanans blå linje',
                       u'linenumber': u'10',
                       u'stationname': u'Sundbybergs centrum',
                       u'time': 8,
                       u'transportmode': u'METRO'},
-                     {u'destination': u'Hjulsta',
+                  {u'destination': u'Hjulsta',
                       u'displaytime': u'16 min.',
                       u'groupofline': u'Tunnelbanans blå linje',
                       u'linenumber': u'10',

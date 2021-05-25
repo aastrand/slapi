@@ -2,13 +2,14 @@
 
 import os
 
-from yaml import load, dump
+from yaml import load
 try:
-    from yaml import CLoader as Loader, CDumper as Dumper
+    from yaml import CLoader as Loader
 except ImportError:
-    from yaml import Loader, Dumper
+    from yaml import Loader
 
 MANDATORY_KEYS = ['station-key', 'departure-key']
+
 
 def load_config(f):
     if not os.path.isfile(f):
@@ -23,4 +24,3 @@ def load_config(f):
         if key not in config:
             raise ValueError('Missing mandatory configration key: %s' % key)
     return config
-

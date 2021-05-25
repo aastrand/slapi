@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 
-import copy
 import datetime
 import json
 import logging
@@ -26,7 +25,8 @@ VALUES_OF_INTEREST = (u'TransportMode',
 
 # combined regex for metro-style and train-style displayrows
 # matches both HH:MM and MM min style times
-DISPLAY_NAME_RE = re.compile('^([0-9]+) +([a-zA-ZåäöÅÄÖ\.]+) *([0-9]+[:0-9]* ?[min]*\.?) *,?')
+DISPLAY_NAME_RE = re.compile(
+    r'^([0-9]+) +([a-zA-ZåäöÅÄÖ\.]+) *([0-9]+[:0-9]* ?[min]*\.?) *,?')
 
 DEPARTURE_URL_TEMPLATE = 'http://api.sl.se/api2/realtimedeparturesV4.json?key=%s&siteid=%s&timewindow=60'
 STATION_URL_TEMPLATE = 'https://api.sl.se/api2/typeahead.json?key=%s&searchstring=%s&stationsonly=true&maxresults=1'
@@ -277,7 +277,8 @@ def handle_flapping_displays(station, data, cached_data):
                         old_d[u'firstseen'] = timestamp
                         old_d[u'firsttime'] = old_d[u'time']
 
-                    old_d[u'time'] = old_d[u'firsttime'] - calc_dt(old_d[u'firstseen'])
+                    old_d[u'time'] = old_d[u'firsttime'] - \
+                        calc_dt(old_d[u'firstseen'])
                     keep.append(old_d)
     return keep
 

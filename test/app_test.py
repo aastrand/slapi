@@ -5,10 +5,8 @@ import json
 import unittest
 
 import slapi.main as app
-import slapi.model as model
 
-from mock import patch, Mock
-from flask import request
+from mock import patch
 
 
 app.app.api_config = {}
@@ -72,13 +70,13 @@ class ModelTest(unittest.TestCase):
     @patch('slapi.main.get_departures')
     def test_args_json(self, get_dep_mock):
         get_dep_mock.return_value = [{'time': 2, 'transportmode': 'TRAIN',
-                                'destination': 'kongo'},
-                                {'time': 3, 'transportmode': 'TRAIN',
-                                'destination': 'lars'},
-                                {'time': 5, 'transportmode': 'TRAIN',
-                                'destination': 'jimmy'},
-                                {'time': 10, 'transportmode': 'TRAIN',
-                                'destination': 'jeppson'}]
+                                      'destination': 'kongo'},
+                                     {'time': 3, 'transportmode': 'TRAIN',
+                                      'destination': 'lars'},
+                                     {'time': 5, 'transportmode': 'TRAIN',
+                                      'destination': 'jimmy'},
+                                     {'time': 10, 'transportmode': 'TRAIN',
+                                      'destination': 'jeppson'}]
 
         # json rendering
         with app.app.test_request_context('/v1/station/9325/departures?alt=json'):
@@ -103,20 +101,20 @@ class ModelTest(unittest.TestCase):
     @patch('slapi.main.get_departures')
     def test_args_limit(self, get_dep_mock):
         get_dep_mock.return_value = [{'time': 2, 'transportmode': 'TRAIN',
-                                'destination': 'kongo'},
-                                {'time': 3, 'transportmode': 'TRAIN',
-                                'destination': 'lars'},
-                                {'time': 5, 'transportmode': 'TRAIN',
-                                'destination': 'jimmy'},
-                                {'time': 10, 'transportmode': 'TRAIN',
-                                'destination': 'jeppson'}]
+                                      'destination': 'kongo'},
+                                     {'time': 3, 'transportmode': 'TRAIN',
+                                      'destination': 'lars'},
+                                     {'time': 5, 'transportmode': 'TRAIN',
+                                      'destination': 'jimmy'},
+                                     {'time': 10, 'transportmode': 'TRAIN',
+                                      'destination': 'jeppson'}]
 
         # limit
         with app.app.test_request_context('/v1/station/9325/departures?alt=json&limit=crap'):
             r = app.departures(9325)
             self.assertEquals(r.status_code, 400)
             self.assertEquals(str(r.response[0], 'UTF-8'),
-                             'Error while parsing argument limit')
+                              'Error while parsing argument limit')
 
         with app.app.test_request_context('/v1/station/9325/departures?alt=json&limit=3'):
             r = app.departures(9325)
@@ -180,7 +178,7 @@ class ModelTest(unittest.TestCase):
         with app.app.test_request_context('/v1/station/9325/departures?alt=json&buses=none&trams=none'):
             r = app.departures(9325)
             self.assertEquals(r.status_code, 200)
-            expected =  {'Trams': set([u'none']), 'Buses': set([u'none'])}
+            expected = {'Trams': set([u'none']), 'Buses': set([u'none'])}
             self.assertEquals(get_dep_mock.call_args_list[0][0][2], expected)
             get_dep_mock.reset_mock()
 
@@ -188,7 +186,7 @@ class ModelTest(unittest.TestCase):
         with app.app.test_request_context('/v1/station/9325/departures?alt=json&metros=10,19'):
             r = app.departures(9325)
             self.assertEquals(r.status_code, 200)
-            expected =  {'Metros': set(['10', '19'])}
+            expected = {'Metros': set(['10', '19'])}
             self.assertEquals(get_dep_mock.call_args_list[0][0][2], expected)
             get_dep_mock.reset_mock()
 

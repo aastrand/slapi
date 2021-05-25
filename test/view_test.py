@@ -2,29 +2,27 @@
 
 import unittest
 
-from mock import patch, Mock
-
 from slapi import view
 
 
 class ViewTest(unittest.TestCase):
     def test_get_transport_color(self):
         departure = {u'destination': u'Kungsträdg.',
-                    u'displaytime': u'5 min',
-                    u'groupofline': u'tunnelbanans blå linje',
-                    u'linenumber': u'10',
-                    u'stationname': u'Sundbybergs centrum',
-                    u'time': 5,
-                    u'transportmode': u'METRO'}
+                     u'displaytime': u'5 min',
+                     u'groupofline': u'tunnelbanans blå linje',
+                     u'linenumber': u'10',
+                     u'stationname': u'Sundbybergs centrum',
+                     u'time': 5,
+                     u'transportmode': u'METRO'}
         self.assertEquals(view.get_transport_color(departure), 'blue')
 
-        departure[u'groupofline'] =  u'tunnelbanans gröna linje'
+        departure[u'groupofline'] = u'tunnelbanans gröna linje'
         self.assertEquals(view.get_transport_color(departure), 'green')
 
-        departure[u'groupofline'] =  u'tunnelbanans röda linje'
+        departure[u'groupofline'] = u'tunnelbanans röda linje'
         self.assertEquals(view.get_transport_color(departure), 'red')
 
-        departure[u'groupofline'] =  u'tunnelbanans gula linje'
+        departure[u'groupofline'] = u'tunnelbanans gula linje'
         self.assertEquals(view.get_transport_color(departure), 'mediumGray')
 
         del departure[u'groupofline']
@@ -45,21 +43,21 @@ class ViewTest(unittest.TestCase):
 
     def test_get_description(self):
         departure = {u'destination': u'Kungsträdg.',
-                    u'displaytime': u'5 min',
-                    u'groupofline': u'tunnelbanans blå linje',
-                    u'linenumber': u'10',
-                    u'stationname': u'Sundbybergs centrum',
-                    u'time': 5,
-                    u'transportmode': u'METRO'}
+                     u'displaytime': u'5 min',
+                     u'groupofline': u'tunnelbanans blå linje',
+                     u'linenumber': u'10',
+                     u'stationname': u'Sundbybergs centrum',
+                     u'time': 5,
+                     u'transportmode': u'METRO'}
 
         expected = '<img src="/static/T-bla.png" height="40px" />'
         self.assertEquals(view.get_description(departure), expected)
 
-        departure[u'groupofline'] =  u'tunnelbanans gröna linje'
+        departure[u'groupofline'] = u'tunnelbanans gröna linje'
         expected = '<img src="/static/T-gron.png" height="40px" />'
         self.assertEquals(view.get_description(departure), expected)
 
-        departure[u'groupofline'] =  u'tunnelbanans röda linje'
+        departure[u'groupofline'] = u'tunnelbanans röda linje'
         expected = '<img src="/static/T-rod.png" height="40px" />'
         self.assertEquals(view.get_description(departure), expected)
 
@@ -69,20 +67,20 @@ class ViewTest(unittest.TestCase):
         self.assertEquals(view.get_description(departure), expected)
 
     def test_render(self):
-        data = [{ u'destination': u'Kungsträdg.',
-                  u'displaytime': u'5 min',
-                  u'groupofline': u'tunnelbanans blå linje',
-                  u'linenumber': u'10',
-                  u'stationname': u'Sundbybergs centrum',
-                  u'time': 5,
-                  u'transportmode': u'METRO'},
-                 {u'destination': u'Kungsträdg.',
-                  u'displaytime': u'5 min',
-                  u'groupofline': u'tunnelbanans blå linje',
-                  u'linenumber': u'10',
-                  u'stationname': u'Sundbybergs centrum',
-                  u'time': 5,
-                  u'transportmode': u'METRO'}]
+        data = [{u'destination': u'Kungsträdg.',
+                 u'displaytime': u'5 min',
+                 u'groupofline': u'tunnelbanans blå linje',
+                 u'linenumber': u'10',
+                 u'stationname': u'Sundbybergs centrum',
+                 u'time': 5,
+                 u'transportmode': u'METRO'},
+                {u'destination': u'Kungsträdg.',
+                 u'displaytime': u'5 min',
+                 u'groupofline': u'tunnelbanans blå linje',
+                 u'linenumber': u'10',
+                 u'stationname': u'Sundbybergs centrum',
+                 u'time': 5,
+                 u'transportmode': u'METRO'}]
         expected = u"""<table id="sl_time_table">
 <tr><th style="width:3%"></th>
 <th style="width:75px;text-align:center"><img src="/static/SL_logo.svg" height="30px" /></th>

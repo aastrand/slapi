@@ -3,9 +3,11 @@
 
 PRE_HEADER = ['<table id="sl_time_table">']
 PRE_HEADER.append('<tr><th style="width:3%"></th>')
-PRE_HEADER.append('<th style="width:75px;text-align:center"><img src="/static/SL_logo.svg" height="30px" /></th>')
+PRE_HEADER.append(
+    '<th style="width:75px;text-align:center"><img src="/static/SL_logo.svg" height="30px" /></th>')
 HEADER_NAME = '<th style="color:#888888;padding-left:20;font-size:24px">%s </th>'
-POST_HEADER = [('<th style="color:#888888;width:12%;text-align:center;font-size:24px">min.</th>')]
+POST_HEADER = [
+    ('<th style="color:#888888;width:12%;text-align:center;font-size:24px">min.</th>')]
 POST_HEADER.append('</tr>')
 
 PRE_ROW = '<tr>'
@@ -51,7 +53,8 @@ def get_description(departure):
                                       TRANSPORT_IMAGE.get(departure.get(u'groupofline')))
 
     if not description:
-        description = departure.get(u'linenumber') or departure.get(u'groupofline')
+        description = departure.get(
+            u'linenumber') or departure.get(u'groupofline')
 
     return description
 
