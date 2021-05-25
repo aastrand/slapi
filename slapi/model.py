@@ -89,8 +89,6 @@ def parse_displayrow(text):
     # sometimes displayrows are empty dicts
     if isinstance(text, dict):
         return []
-    # encode, otherwise we dont match Kungsträdgården etc
-    text = text.encode('UTF-8')
     data = []
     # each line can contain more than one line/destination/time tuple
     # iterate over each match, extract, remove matched data and try again
@@ -98,9 +96,9 @@ def parse_displayrow(text):
         match = DISPLAY_NAME_RE.match(text)
         if match:
             row = {}
-            row[u'linenumber'] = match.group(1).decode('UTF-8')
-            row[u'destination'] = match.group(2).decode('UTF-8')
-            row[u'displaytime'] = match.group(3).strip().decode('UTF-8')
+            row[u'linenumber'] = match.group(1)
+            row[u'destination'] = match.group(2)
+            row[u'displaytime'] = match.group(3).strip()
             data.append(row)
             text = text[len(match.group(0)):].strip()
         else:
@@ -127,6 +125,7 @@ def convert_time(time):
     '8 min.'' => 8
     '12:22' (at the time of 12:18) => 4
     '9' => 9
+    '-' => 0
     """
     if 'min' in time:
         time = time.replace('min', '').replace('.', '').strip()
@@ -150,6 +149,8 @@ def convert_time(time):
 
         time = round((dtime - now).total_seconds() / 60.0)
 
+    if time == '-':
+        time = 0
 
     return int(time)
 
