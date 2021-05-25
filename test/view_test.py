@@ -101,4 +101,4 @@ class ViewTest(unittest.TestCase):
 </tr>
 </table>"""
         self.assertEqual(view.render_html_table('Sundbyberg', data),
-                          expected)
+                         expected)

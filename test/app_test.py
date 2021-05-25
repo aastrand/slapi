@@ -87,14 +87,14 @@ class ModelTest(unittest.TestCase):
             self.assertEqual(r.status_code, 200)
             resp = json.loads(r.response[0])
             self.assertEqual(resp, [{'time': 2, 'transportmode': 'TRAIN',
-                                      'destination': 'kongo'},
-                                     {'time': 3, 'transportmode': 'TRAIN',
-                                      'destination': 'lars'},
-                                     {'time': 5, 'transportmode': 'TRAIN',
-                                      'destination': 'jimmy'},
-                                     {'time': 10, 'transportmode': 'TRAIN',
-                                      'destination': 'jeppson',
-                                      'crap': u'2013-01-01 00:00:00'}])
+                                     'destination': 'kongo'},
+                                    {'time': 3, 'transportmode': 'TRAIN',
+                                     'destination': 'lars'},
+                                    {'time': 5, 'transportmode': 'TRAIN',
+                                     'destination': 'jimmy'},
+                                    {'time': 10, 'transportmode': 'TRAIN',
+                                     'destination': 'jeppson',
+                                     'crap': u'2013-01-01 00:00:00'}])
             del get_dep_mock.return_value[3]['crap']
 
     @patch('slapi.main.get_station_name', lambda *x: 'test')
@@ -114,18 +114,18 @@ class ModelTest(unittest.TestCase):
             r = app.departures(9325)
             self.assertEqual(r.status_code, 400)
             self.assertEqual(str(r.response[0], 'UTF-8'),
-                              'Error while parsing argument limit')
+                             'Error while parsing argument limit')
 
         with app.app.test_request_context('/v1/station/9325/departures?alt=json&limit=3'):
             r = app.departures(9325)
             self.assertEqual(r.status_code, 200)
             resp = json.loads(r.response[0])
             self.assertEqual(resp, [{'time': 2, 'transportmode': 'TRAIN',
-                                      'destination': 'kongo'},
-                                     {'time': 3, 'transportmode': 'TRAIN',
-                                      'destination': 'lars'},
-                                     {'time': 5, 'transportmode': 'TRAIN',
-                                      'destination': 'jimmy'}])
+                                     'destination': 'kongo'},
+                                    {'time': 3, 'transportmode': 'TRAIN',
+                                     'destination': 'lars'},
+                                    {'time': 5, 'transportmode': 'TRAIN',
+                                     'destination': 'jimmy'}])
 
     @patch('slapi.main.get_station_name', lambda *x: 'test')
     @patch('slapi.main.get_departures')
@@ -144,9 +144,9 @@ class ModelTest(unittest.TestCase):
             self.assertEqual(r.status_code, 200)
             resp = json.loads(r.response[0])
             self.assertEqual(resp, [{'time': 5, 'transportmode': 'TRAIN',
-                                      'destination': 'jimmy'},
-                                     {'time': 10, 'transportmode': 'TRAIN',
-                                      'destination': 'jeppson'}])
+                                     'destination': 'jimmy'},
+                                    {'time': 10, 'transportmode': 'TRAIN',
+                                     'destination': 'jeppson'}])
 
     @patch('slapi.main.get_station_name', lambda *x: 'test')
     @patch('slapi.main.get_departures')
@@ -165,9 +165,9 @@ class ModelTest(unittest.TestCase):
             self.assertEqual(r.status_code, 200)
             resp = json.loads(r.response[0])
             self.assertEqual(resp, [{'time': 3, 'transportmode': 'TRAIN',
-                                      'destination': 'lars'},
-                                     {'time': 5, 'transportmode': 'TRAIN',
-                                      'destination': 'jimmy'}])
+                                     'destination': 'lars'},
+                                    {'time': 5, 'transportmode': 'TRAIN',
+                                     'destination': 'jimmy'}])
 
     @patch('slapi.main.get_station_name', lambda *x: 'test')
     @patch('slapi.main.get_departures')
