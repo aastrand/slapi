@@ -917,7 +917,7 @@ class ModelTest(unittest.TestCase):
         self.assertEqual(model.convert_time('Nu'), 0)
 
         self.assertEqual(model.convert_time('-1 min'), -1)
-        self.assertEqual(model.convert_time('-'), 0)
+        self.assertEqual(model.convert_time('-'), -1)
 
     @patch('slapi.model.requests')
     @patch('slapi.model.get_now')

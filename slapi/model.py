@@ -154,8 +154,7 @@ def convert_time(time):
     try:
         return int(r)
     except ValueError:
-        print("Error converting time: " + time)
-        return 0
+        return -1
 
 
 def parse_json_response(text, whitelist=None):
@@ -207,7 +206,7 @@ def parse_json_response(text, whitelist=None):
 
                 row[u'time'] = convert_time(row[u'displaytime'])
                 # there's no point in displaying these is there?
-                if row[u'time'] < 100:
+                if 0 <= row[u'time'] < 100:
                     data.append(row)
 
     return data
