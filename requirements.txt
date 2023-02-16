@@ -2,7 +2,7 @@ Flask==2.0.0
 Jinja2==3.0.1
 MarkupSafe==2.0.1
 PyYAML==5.4
-Werkzeug==2.0.1
+Werkzeug==2.2.3
 coverage==3.7
 decorator==3.4.0
 gocept.cache==0.6.1
